@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#070d16"><title>Whiteout Protocol</title>
+<style>:root{--bg:#070d16;--panel:#0f1a28;--panel2:#142335;--ice:#bfe6ff;--ice2:#7fb8de;--dim:#6f8aa3;--txt:#e6f2fb;--red:#ff4d5e;--amber:#ffc35a;--green:#7ef0b4;--line:#22384f}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;touch-action:manipulation}
+body{background:radial-gradient(120% 60% at 50% 0%,#12263d 0%,#070d16 60%) fixed;min-height:100vh}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+#app{max-width:480px;margin:0 auto;padding:calc(8px + env(safe-area-inset-top)) 10px calc(24px + env(safe-area-inset-bottom))}
+.hide{display:none!important}
+h1,h2,h3{margin:.2em 0;font-weight:700;letter-spacing:.02em}
+.title{font-size:34px;text-align:center;letter-spacing:.12em;text-transform:uppercase;color:var(--ice);text-shadow:0 0 18px #4aa8ff88;margin-top:8vh}
+.sub{text-align:center;color:var(--dim);margin-bottom:24px}
+.snow{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;background-image:radial-gradient(2px 2px at 20% 30%,#fff8,transparent),radial-gradient(1.5px 1.5px at 70% 60%,#fff6,transparent),radial-gradient(2px 2px at 40% 80%,#fff5,transparent),radial-gradient(1px 1px at 85% 15%,#fff7,transparent),radial-gradient(1.5px 1.5px at 10% 70%,#fff5,transparent);background-size:220px 220px;animation:snow 14s linear infinite}
+@keyframes snow{from{background-position:0 0,0 0,0 0,0 0,0 0}to{background-position:-40px 220px,30px 220px,-20px 220px,10px 220px,-30px 220px}}
+#app>*{position:relative;z-index:1}
+.btn{display:block;width:100%;min-height:48px;margin:8px 0;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:linear-gradient(#183049,#11233a);font-weight:600;text-align:left}
+.btn:active{transform:scale(.98);background:#1d3a58}
+.btn.primary{background:linear-gradient(#2a74b8,#1b4f86);border-color:#3d8fd6;text-align:center}
+.btn.danger{background:linear-gradient(#7a1e2a,#55131d);border-color:#a8303f}
+.btn.ghost{background:transparent}
+.btn small{display:block;font-weight:400;color:var(--dim);font-size:12px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.seg{display:flex;gap:6px;margin:6px 0 14px}.seg button{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-weight:600}
+.seg button.on{background:#1f5288;border-color:#4b9be0;color:#fff}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0}
+.lbl{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-top:6px}
+.howto p,.howto li{color:#cfe3f2}.howto ul{padding-left:20px;margin:6px 0}.howto b{color:var(--ice)}
+/* game */
+.top{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
+.top .t{font-weight:800;letter-spacing:.1em;color:var(--ice);font-size:14px;text-transform:uppercase}
+.top .r{font-size:13px;color:var(--dim)}
+.iconbtn{min-width:40px;min-height:36px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:16px}
+.meters{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.meter{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 8px;font-size:12px}
+.meter .n{display:flex;justify-content:space-between;color:var(--dim)}
+.pips{display:flex;gap:3px;margin-top:4px}.pip{flex:1;height:7px;border-radius:4px;background:#22364c}
+.pip.on{background:var(--ice2)}.meter.crit .pip.on{background:var(--red)}.meter.warn .pip.on{background:var(--amber)}
+.meter.crit{border-color:#7a2633;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 2px #ff4d5e55}}
+.bar{height:8px;background:#22364c;border-radius:4px;overflow:hidden;margin-top:4px}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#4aa8ff,#9fe0ff)}
+.bar.frost>i{background:linear-gradient(90deg,#9fd8ff,#ffffff)}
+.meters2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.map{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;padding:8px;border-radius:14px;background:repeating-linear-gradient(45deg,#0b1522,#0b1522 6px,#0d1927 6px,#0d1927 12px);border:1px solid var(--line)}
+.tile{position:relative;min-height:96px;border-radius:12px;background:var(--panel2);border:1px solid #284360;padding:5px 5px 4px;display:flex;flex-direction:column;text-align:left}
+.tile .nm{font-size:11px;font-weight:700;color:#cfe6f7;line-height:1.15}
+.tile .em{position:absolute;right:5px;top:3px;font-size:18px;opacity:.85}
+.tile .tag{font-size:10px;color:var(--dim)}
+.tile .tok{display:flex;flex-wrap:wrap;gap:3px;margin-top:auto}
+.tile.here{border-color:#e6f2fb;box-shadow:0 0 0 1px #e6f2fb inset}
+.tile.go{border-color:#4b9be0;background:#173250}
+.tile.go::after{content:"tap to move";position:absolute;right:5px;bottom:-1px;font-size:9px;color:#8fc6f2}
+.tile.sel{background:#1f5288;border-color:#9fe0ff;box-shadow:0 0 12px #4aa8ff88}
+.tile.sel::after{content:"✓ chosen";color:#fff}
+.tile.broken{background:#2a1820}
+.tk{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#06101b;border:2px solid #0006}
+.tk.me{border-color:#fff;box-shadow:0 0 0 2px #4aa8ff}
+.tk.ally{outline:2px solid var(--red);outline-offset:1px}
+.locker{margin-top:8px;padding:6px 10px;border-radius:12px;border:1px dashed #3b5878;font-size:12px;color:var(--dim);display:flex;gap:6px;align-items:center;flex-wrap:wrap;min-height:36px}
+.panel{background:linear-gradient(#11233a,#0d1b2c);border:1px solid #2c4a6b;border-radius:14px;padding:12px;margin-top:10px}
+.panel .ph{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--ice2)}
+.panel .pr{margin:4px 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;min-height:40px;border-radius:20px;border:1px solid var(--line);background:var(--panel)}
+.me-card>div:first-child{flex:none}.me-card{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.role{font-weight:800;letter-spacing:.08em}.role.crew{color:var(--green)}.role.hollow{color:var(--red)}
+.items{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.item{font-size:12px;padding:4px 8px;border-radius:8px;background:#1a2e44;border:1px solid var(--line)}
+.crew{display:grid;grid-template-columns:1fr;gap:4px}
+.crow{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;background:var(--panel);border:1px solid var(--line);min-height:44px;width:100%;text-align:left}
+.crow .who{flex:1}.crow .loc{font-size:12px;color:var(--dim)}
+.badge{font-size:11px;padding:2px 6px;border-radius:6px;background:#1c3550;color:#bfe6ff;margin-left:4px}
+.badge.red{background:#4a1520;color:#ffb3bc}.badge.grn{background:#123b2b;color:#a8f5cf}
+.note{font-size:16px;min-width:22px;text-align:center}
+.log{max-height:260px;overflow:auto;-webkit-overflow-scrolling:touch;font-size:13px}
+.log div{padding:5px 2px;border-bottom:1px solid #162a3e}
+.log .rn{color:var(--dim);font-size:11px;margin-right:4px}
+.log .chat{color:#d9ecff}.log .chat b{font-weight:700}
+.log .alert{color:#ffb3bc}.log .event{color:#ffd99a}.log .priv{color:#a8f5cf}.log .sys{color:var(--dim)}
+.modal{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal .box{background:var(--panel);border:1px solid #36597d;border-radius:16px;padding:16px;max-width:440px;width:100%;max-height:88vh;overflow:auto}
+.big{font-size:30px;font-weight:900;letter-spacing:.1em;text-align:center}
+.big.win{color:var(--green)}.big.lose{color:var(--red)}
+.reveal div{padding:4px 0;border-bottom:1px solid #1a2e44}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1f5288;border:1px solid #4b9be0;padding:10px 14px;border-radius:12px;z-index:60;max-width:90vw;font-size:14px}
+/* v2 art */
+.ic{width:20px;height:20px;vertical-align:-4px;flex:none}
+.ic.sm{width:16px;height:16px;vertical-align:-3px}.ic.xs{width:12px;height:12px;vertical-align:-2px}
+.ic.act{width:26px;height:26px;color:var(--ice)}
+.btn{display:flex;align-items:center;gap:10px}.btn.primary,.btn.c{justify-content:center}
+.btn.act span{flex:1}.btn.danger .ic.act{color:#ffb3bc}
+.hero{margin:-8px -10px 0;position:relative}.titleart{display:block;width:100%;height:auto;border-radius:0 0 18px 18px;box-shadow:0 10px 30px #000a}
+.hero+.title{margin-top:14px}
+.aur{animation:aur 7s ease-in-out infinite alternate;transform-origin:50% 50%}@keyframes aur{from{opacity:.55;transform:translateX(-6px) scaleY(.92)}to{opacity:1;transform:translateX(6px) scaleY(1.08)}}
+.blink{animation:blink 1.6s steps(2) infinite}@keyframes blink{50%{opacity:.1}}
+.flakes{animation:fall 9s linear infinite}@keyframes fall{from{transform:translate(0,-230px)}to{transform:translate(-30px,0)}}
+#frost{position:fixed;inset:0;pointer-events:none;z-index:40;background:radial-gradient(ellipse at center,transparent 58%,rgba(190,230,255,.28) 82%,rgba(235,248,255,.55) 100%);transition:opacity 1s}
+.hint{font-size:12px;color:var(--dim);margin:-6px 0 10px}
+.seg button small{font-weight:400;color:var(--dim);font-size:11px}.seg button.on small{color:#cfe6ff}
+.seedrow{display:flex;gap:8px;margin:6px 0 10px}.seedrow input{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--line);background:#0a1522;color:#fff;font:600 18px/1 ui-monospace,Menlo,monospace;letter-spacing:.2em;padding:0 12px;text-transform:uppercase}
+.map{display:grid;gap:0;padding:8px}.map .tile{z-index:1}
+.map.w4 .tile{min-height:82px;padding:4px 3px 3px}.map.w4 .tile .nm{font-size:10px}.map.w4 .tile .em .ic{width:15px;height:15px}
+.tile .em{color:#9fd0f5;opacity:.9}.tile .em .ic{width:18px;height:18px}
+.tile .nm{padding-right:16px;min-height:24px}
+.tile .tag{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.tile.dk{background:#0b121c;border-color:#1c2c3e}.tile.dk .nm{color:#7f97ad}
+.tile.go::after{content:"move"}
+.cor{align-self:center;justify-self:stretch;margin:0 -5px;height:9px;box-shadow:0 0 6px #4aa8ff66;background:linear-gradient(90deg,#2f5274,#4b7aa3,#2f5274);border-radius:3px}
+.cor.v{margin:-5px 0;height:auto;width:9px;justify-self:center;align-self:stretch;background:linear-gradient(#2f5274,#4b7aa3,#2f5274)}
+.map.blackout{filter:saturate(.6) brightness(.85)}
+.tk{width:auto;height:auto;border:0;background:none;border-radius:50%;line-height:0}
+.tk .av{border-radius:50%;box-shadow:0 0 0 1.5px #0008}
+.tk.me .av{box-shadow:0 0 0 2px #fff,0 0 0 3.5px #4aa8ff}
+.tk.ally .av{box-shadow:0 0 0 2px var(--red)}
+.mav{line-height:0}
+.item{display:inline-flex;align-items:center;gap:5px;color:inherit;font:inherit;font-size:12px;min-height:34px}
+.fx{font-size:12px;color:#a9cbe6;background:#0b1828;border:1px solid #1d3550;border-radius:10px;padding:6px 8px;margin:4px 0 6px}
+.roomlist{list-style:none;padding:0}.roomlist li{padding:5px 0;border-bottom:1px solid #1a2e44;font-size:13px}
+.meter .n span{display:flex;align-items:center;gap:4px}
+.m-power .ic{color:#ffe27a}.m-radio .ic{color:#8fd3ff}.m-heat .ic{color:#ff9a6b}
+.role{display:flex;align-items:center;gap:6px}
+</style></head><body><div class="snow"></div><div id="frost"></div>
+<div id="app"></div>
+<div id="modal" class="modal hide"><div class="box" id="mbox"></div></div>
+
+<script>(function(){'use strict';
+var R=Math.random;
+function pick(a){return a[Math.floor(R()*a.length)];}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(R()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function maxBy(a,f){var b=null,bv=-Infinity;a.forEach(function(x){var v=f(x);if(v>bv){bv=v;b=x;}});return b;}
+function minBy(a,f){return maxBy(a,function(x){return -f(x);});}
+
+/* ---------- rooms & layout ---------- */
+var ROOM_DEFS=[
+ {id:'mess',name:'Mess Hall',core:1,items:null,fx:'Where everyone starts. No special effect, but rarely empty.'},
+ {id:'gen',name:'Generator Hall',core:1,sys:'power',items:['toolkit'],fx:'Repair or sabotage Power here.'},
+ {id:'comms',name:'Radio Hut',core:1,sys:'radio',items:['booster'],fx:'Repair Radio. Transmit the beacon here (Radio 2+, once per round).'},
+ {id:'boiler',name:'Boiler Room',core:1,sys:'heat',items:null,fx:'Repair or sabotage Heat here.'},
+ {id:'med',name:'Med Bay',core:1,items:['flare'],kitRoom:1,reliable:1,fx:'Test Kits are stocked here. Tests here never fail.'},
+ {id:'lab',name:'Core Lab',items:[],kitRoom:1,reliable:1,fx:'Holds Test Kits. Tests here never fail.'},
+ {id:'dome',name:'Star Dome',items:['booster','flare'],lookout:1,fx:'Keep watch here to spot the storm: any storm damage this round is announced instead of silent.'},
+ {id:'bay',name:'Snowcat Bay',items:['toolkit','toolkit'],safe:1,fx:'Floodlit. Nobody can be turned here.'},
+ {id:'bunks',name:'Bunk Room',items:['flare','toolkit'],sure:1,fx:'Personal lockers: searching always finds gear while any is left (needs light).'},
+ {id:'glass',name:'Glasshouse',items:['flare','booster'],lit:1,fx:'Grow lamps on a separate circuit: stays lit in a blackout, and searching is easier.'},
+ {id:'depot',name:'Fuel Depot',alt:'heat',items:['toolkit'],fx:'A second fuel line to the boiler: repair (+1 only) or sabotage Heat from here.'},
+ {id:'shop',name:'Workshop',items:['toolkit'],tinker:1,fx:'Bench repair: restore 1 to whichever of Power or Radio is lower (once per round).'},
+ {id:'mast',name:'Relay Mast',items:['booster'],relay:1,fx:'A second transmitter. Works only while Radio is at full (3/3).'},
+ {id:'vault',name:'Cold Vault',items:['kit','flare','booster'],dark:1,kitRoom:1,fx:'Always pitch dark: sabotage is never seen and the Hollow can strike with three in the room. Good gear inside.'},
+ {id:'sauna',name:'Steam Sauna',items:null,thaw:1,fx:'Keep watch here while Heat is 1+ to thaw 1 frost (once per round).'},
+ {id:'archive',name:'Ice Core Archive',items:['kit'],kitRoom:1,odds:0.5,fx:'Spare Test Kits among the sample racks, but searching is slow (50%).'}
+];
+var RDEF={};ROOM_DEFS.forEach(function(r){RDEF[r.id]=r;});
+var OPTIONAL=['lab','dome','bay','bunks','glass','depot','shop','mast','vault','sauna','archive'];
+var SIZES={small:{w:3,h:3,label:'Small'},medium:{w:3,h:4,label:'Medium'},large:{w:4,h:4,label:'Large'}};
+var CLASSIC={
+ small:[['comms','dome','bay'],['lab','mess','bunks'],['gen','boiler','med']],
+ medium:[['comms','mast','dome'],['lab','mess','bunks'],['shop','glass','med'],['gen','boiler','depot']],
+ large:[['comms','mast','dome','bay'],['lab','mess','glass','bunks'],['archive','shop','sauna','med'],['gen','boiler','depot','vault']]
+};
+function seedRng(str){var h=1779033703^str.length;for(var i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19;}
+ var a=h>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+function randSeed(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';for(var i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+function connected(ids,edges){var adjm={};ids.forEach(function(i){adjm[i]=[];});edges.forEach(function(e){adjm[e[0]].push(e[1]);adjm[e[1]].push(e[0]);});
+ var seen={},q=[ids[0]];seen[ids[0]]=1;while(q.length){var x=q.shift();adjm[x].forEach(function(y){if(!seen[y]){seen[y]=1;q.push(y);}});}return Object.keys(seen).length===ids.length;}
+function genLayout(size,random,seed){
+ var sz=SIZES[size]||SIZES.small,w=sz.w,h=sz.h,grid;
+ if(!random){grid=CLASSIC[size];}
+ else{var rng=seedRng(String(seed||'X').toUpperCase());var sh=function(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(rng()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;};
+  var ids=['mess','gen','comms','boiler','med'].concat(sh(OPTIONAL.slice()).slice(0,w*h-5));sh(ids);grid=[];for(var y=0;y<h;y++)grid.push(ids.slice(y*w,y*w+w));
+  var L0=layoutFromGrid(grid,w,h);var edges=sh(L0.edges.slice()),cut=Math.floor(edges.length*0.2),kept=edges.slice(),allIds=L0.cells.map(function(c){return c.id;});
+  for(var k=0;k<edges.length&&cut>0;k++){var trial=kept.filter(function(e){return e!==edges[k];});if(connected(allIds,trial)){kept=trial;cut--;}}
+  L0.edges=kept;L0.random=true;L0.seed=String(seed).toUpperCase();L0.size=size;return L0;}
+ var L=layoutFromGrid(grid,w,h);L.random=false;L.seed='CLASSIC';L.size=size;return L;
+}
+function layoutFromGrid(grid,w,h){var cells=[],edges=[];for(var y=0;y<h;y++)for(var x=0;x<w;x++){cells.push({id:grid[y][x],x:x,y:y});if(x<w-1)edges.push([grid[y][x],grid[y][x+1]]);if(y<h-1)edges.push([grid[y][x],grid[y+1][x]]);}return {w:w,h:h,cells:cells,edges:edges};}
+var ROOMS=[],RM={},ADJ={},DIST={},LAYOUT=null;
+function applyLayout(L){LAYOUT=L;ROOMS=L.cells.map(function(c){var r={};for(var k in RDEF[c.id])r[k]=RDEF[c.id][k];r.x=c.x;r.y=c.y;return r;});RM={};ADJ={};
+ ROOMS.forEach(function(r){RM[r.id]=r;ADJ[r.id]=[];});L.edges.forEach(function(e){ADJ[e[0]].push(e[1]);ADJ[e[1]].push(e[0]);});
+ DIST={};ROOMS.forEach(function(r){var d={},q=[r.id];d[r.id]=0;while(q.length){var x=q.shift();ADJ[x].forEach(function(y){if(d[y]===undefined){d[y]=d[x]+1;q.push(y);}});}DIST[r.id]=d;});}
+function hasEdge(a,b){return ADJ[a]&&ADJ[a].indexOf(b)>=0;}
+function dist(a,b){if(a==='locker'||b==='locker'||!DIST[a])return 99;var v=DIST[a][b];return v===undefined?99:v;}
+function adj(a){return ADJ[a]||[];}
+var SYS={power:{name:'Power',room:'gen'},radio:{name:'Radio',room:'comms'},heat:{name:'Heat',room:'boiler'}};
+var SYSK=['power','radio','heat'];
+function sysOf(room){var r=RM[room];return r?(r.sys||r.alt||null):null;}
+function sysRooms(k){return ROOMS.filter(function(r){return r.sys===k||r.alt===k;}).map(function(r){return r.id;});}
+function darkAt(room){var r=RM[room];if(!r)return false;return !!r.dark||(S.sys.power<=0&&!r.lit);}
+function canTurnAt(room,n){var r=RM[room];if(!r||r.safe)return false;return n===2||(darkAt(room)&&n===3);}
+function reliableAt(room){return !!(RM[room]&&RM[room].reliable);}
+var ITEMS={
+ kit:{name:'Test Kit',emo:'🧫',desc:'Test someone in your room (needs Power). Everyone sees the result. Single use.'},
+ toolkit:{name:'Toolkit',emo:'🧰',desc:'Your repairs restore 2 instead of 1. Kept after use.'},
+ flare:{name:'Flare',emo:'🎆',desc:'Fires automatically if someone tries to turn you: the attack fails and everyone hears who did it.'},
+ booster:{name:'Signal Booster',emo:'📶',desc:'Your next transmission adds 2 to the beacon instead of 1.'}
+};
+var DIFF={
+ easy:{label:'Easy',kits:4,beacon:8,frostMax:5,weight:0.85,noise:10,bluff:0.3,careful:0.35,turnP:0.85,testT:30,voteT:50,propT:58,predict:0.2},
+ normal:{label:'Normal',kits:3,beacon:11,frostMax:4,weight:1,noise:8,bluff:0.65,careful:0.75,turnP:0.88,testT:32,voteT:55,propT:62,predict:0.6},
+ hard:{label:'Hard',kits:3,beacon:12,hollowBonus:1,frostMax:4,weight:1.15,noise:4,bluff:0.92,careful:0.95,turnP:0.92,testT:34,voteT:56,propT:64,predict:0.9}
+};
+var MAXR=24;
+var CREW_POOL=[
+ {name:'Ines',color:'#7fd3ff',pers:'quiet'},{name:'Tobias',color:'#ffb86b',pers:'gruff'},
+ {name:'Mara',color:'#b9f18c',pers:'analytical'},{name:'Dev',color:'#ff8fb1',pers:'cheerful'},
+ {name:'Hollis',color:'#c8a2ff',pers:'sarcastic'},{name:'Yuki',color:'#fff27a',pers:'nervous'},
+ {name:'Sasha',color:'#7dffd8',pers:'blunt'},{name:'Ruben',color:'#ffa98a',pers:'warm'}
+];
+var PERS={quiet:{caution:1.2,voteAdj:4},gruff:{caution:0.8,voteAdj:-3},analytical:{caution:1,voteAdj:3},cheerful:{caution:0.9,voteAdj:2},sarcastic:{caution:0.9,voteAdj:0},nervous:{caution:1.5,voteAdj:-6},blunt:{caution:0.8,voteAdj:-8},warm:{caution:1.1,voteAdj:6},player:{caution:1,voteAdj:0}};
+var LINES={
+ quiet:{acc:["...Watch {t}.","{t}. Just a feeling. A bad one.","Nobody else noticed {t} slipping away?"],def:["I didn't do anything.","...Test me, then."],idle:["...","Listen. The wind sounds different tonight.","Stay where I can see you."]},
+ gruff:{acc:["{t}'s been wandering off alone. I don't buy it.","Keep an eye on {t}. Something's off there."],def:["I've been hauling pipe all night. Back off.","Point your fingers somewhere else."],idle:["Wind's picking up. Travel in threes.","Coffee's frozen solid. Perfect."]},
+ analytical:{acc:["By my count {t} has the weakest alibi on the station.","The damage lines up with where {t} has been."],def:["Check the record. My movements are consistent.","Accusing me burns time we don't have."],idle:["The beacon is what matters. Focus.","Keep the heat up and we buy time."]},
+ cheerful:{acc:["Love you all, but {t} is giving me chills. The bad kind.","Not to be dramatic, but... {t}? Hmm."],def:["Me? I'm the one keeping the soup warm!","Come on, I'm the least scary person here."],idle:["Day who-knows-what of the storm. Still smiling. Mostly.","Someone tell a joke before I freeze."]},
+ sarcastic:{acc:["Oh sure, {t} was 'just looking around'. Totally normal.","Great. So {t} is our mystery guest."],def:["Yes, I'm a monster. I also do the dishes. Grow up.","Brilliant detective work. Wrong, but brilliant."],idle:["Remind me why I signed up for this posting.","Lovely weather. Real postcard stuff."]},
+ nervous:{acc:["I-I don't think {t} is... right. Sorry.","Did anyone else see the way {t} looked at us?"],def:["It wasn't me! I was only checking supplies!","Please, just test me if you don't believe me."],idle:["Is it getting colder or is it just me?","Can we please stop splitting up?"]},
+ blunt:{acc:["Lock {t} up. I'm done guessing.","It's {t}. I'd bet my boots on it."],def:["Wrong person. Move on.","If I were one of them you'd already know."],idle:["Nobody goes anywhere alone. Clear?","Fix the heat first. Then talk."]},
+ warm:{acc:["I hate saying it, but I'm worried about {t}.","{t}, if something happened to you out there, tell us."],def:["I'd never hurt any of you. You know me.","I understand the fear. But it isn't me."],idle:["We get through this together.","Everyone eat something, okay?"]}
+};
+var GEN={yes:["Lock the door.","Yes. Better safe than sorry.","Do it."],no:["Not enough proof.","No. We'd be guessing.","I'm not locking up a friend on a hunch."],
+ witness:["I SAW {t} wrecking the {s}!","{t} just tore into the {s}. I watched it happen!"],flare:["{t} came at me! Their face... it split! I had to fire a flare!"],
+ clean:["Thank God. One less to worry about.","Clean. Okay. Breathe."],deny:["That's a lie! I was fixing it!","They're framing me. Think about why."],caught:["...","You have no idea what you've done.","The cold will have you anyway."],
+ found:["It's real. Get it away from us!","I knew it. I KNEW it."]};
+
+var S=null;
+function hollowCount(n,diff){var b=DIFF[diff].hollowBonus||0;if(n===7)b=0;return (n>=7?2:1)+b;}
+function D(){return DIFF[S.diff];}
+function byId(id){return S.crew[id];}
+function nm(c){return c.isPlayer?'You':c.name;}
+function has(c,it){return c.items.indexOf(it)>=0;}
+function take(c,it){var i=c.items.indexOf(it);if(i>=0)c.items.splice(i,1);}
+function occ(room,ex){return S.crew.filter(function(c){return c.free&&c.room===room&&c.id!==ex;});}
+function player(){return S.crew[0];}
+function isAI(c){return c.ai;}
+function log(t,txt,who){if(S.sim)return;S.log.push({r:S.round,t:t,x:txt,w:(who===undefined?null:who)});if(S.log.length>300)S.log.splice(0,S.log.length-300);}
+function say(c,cat,t,s){if(S.sim||!c.ai)return;var pool=(LINES[c.pers]&&LINES[c.pers][cat])||GEN[cat];var line=pick(pool).replace('{t}',t?nm(t):'').replace('{s}',s||'');if(t&&t.isPlayer)line=line.replace(/You's/g,'your').replace(/You has/g,'you have').replace(/You is/g,'you are').replace(/You was/g,'you were').replace(/\bYou\b/g,'you').replace(/^you/,'You').replace(/^your/,'Your');log('chat',line,c.id);}
+function save(){if(S&&!S.sim){try{localStorage.setItem('whiteout-save',JSON.stringify(S));}catch(e){}}}
+function recentlyClean(d){if(d.clean<0||S.round-d.clean>4)return false;return !S.pairs.some(function(p){return p.r>d.clean&&(p.a===d.id||p.b===d.id);});}
+function trust(o,y){if(o.id===y.id)return 1;if(recentlyClean(y))return 1;return clamp((100-o.sus[y.id])/100,0.1,1);}
+function wgt(){var d=D();return d.weight*(1+(R()-0.5)*d.noise/12);}
+function publicSus(id){var v=S.crew.filter(function(o){return o.free&&o.id!==id&&o.role==='crew'&&o.ai;});if(!v.length)return 0;return v.reduce(function(s,o){return s+o.sus[id];},0)/v.length;}
+function bump(o,id,amt){if(o.id===id||o.sus[id]===undefined)return;o.sus[id]=clamp(o.sus[id]+amt,0,100);}
+
+function newGame(o){
+ var d=DIFF[o.diff];var size=o.size||'small';var L=genLayout(size,!!o.random,o.seed||randSeed());applyLayout(L);var nAI=o.ai;
+ var pool=shuffle(CREW_POOL.slice()).slice(0,nAI);
+ var crew=[{name:'You',color:'#ffffff',pers:'player',isPlayer:true}].concat(pool.map(function(p){return {name:p.name,color:p.color,pers:p.pers,isPlayer:false};}));
+ crew.forEach(function(c,i){c.id=i;c.ai=!c.isPlayer||!!o.sim;c.role='crew';c.room='mess';c.free=true;c.items=[];c.sus={};c.clean=-1;c.turnedBy=null;c.turnedR=null;});
+ crew.forEach(function(c){crew.forEach(function(x){if(x.id!==c.id)c.sus[x.id]=8+Math.floor(R()*10);});});
+ var n=crew.length,hc=hollowCount(n,o.diff);
+ var cand;
+ if(o.role==='hollow'){crew[0].role='hollow';cand=crew.slice(1);hc--;}
+ else if(o.role==='crew')cand=crew.slice(1);else cand=crew.slice();
+ shuffle(cand.slice()).slice(0,hc).forEach(function(c){c.role='hollow';});
+ var pools={};ROOMS.forEach(function(r){pools[r.id]=r.items?r.items.slice():[];});
+ var kr=['med'].concat(ROOMS.filter(function(r){return r.kitRoom&&r.id!=='med'&&r.items&&r.items.indexOf('kit')<0;}).map(function(r){return r.id;}));
+ var extra=ROOMS.filter(function(r){return r.items&&r.items.indexOf('kit')>=0;}).length;
+ for(var k=0;k<Math.max(1,d.kits-extra);k++){pools[kr[k%kr.length]].push('kit');}
+ for(var key in pools)shuffle(pools[key]);
+ S={v:2,layout:L,size:size,randomLayout:!!L.random,diff:o.diff,nAI:nAI,roleOpt:o.role,sim:!!o.sim,round:1,phase:'move',crew:crew,sys:{power:3,radio:3,heat:3},frost:0,beacon:0,target:d.beacon,frostMax:d.frostMax+(size==='large'?1:0),pools:pools,log:[],pairs:[],hist:[],cooldown:{},sel:null,vote:null,over:null,notice:null,notes:{},lastBrief:[]};
+ crew.forEach(function(c){if(c.role==='hollow')S.hist.push('Start: '+nm(c)+(c.isPlayer?' were':' was')+' already Hollow.');});
+ log('sys','A whiteout has buried Halvard Ridge Station. The radio crackles, the boiler groans, and someone among you is no longer who they seem.');
+ if(!S.sim){var p=crew[0];
+  if(p.role==='hollow'){var al=crew.filter(function(c){return c.role==='hollow'&&!c.isPlayer;}).map(nm);log('alert','You are HOLLOW. '+(al.length?'Your ally: '+al.join(', ')+'. ':'You are alone in this. ')+'Turn the crew, wreck the station, and never get caught.');}
+  else log('priv','You are CREW. Find the Hollow, keep the heat on, and push the rescue beacon through.');}
+ save();return S;
+}
+
+/* ---------- AI: movement ---------- */
+function humanGoals(c){
+ var g=[],s=S.sys,d=D();
+ var base={heat:[78,50,24],power:[44,30,14],radio:[46,32,16]};
+ SYSK.forEach(function(k){if(s[k]<3)sysRooms(k).forEach(function(rm){g.push({room:rm,score:base[k][s[k]]-(RM[rm].alt?8:0),sys:1});});});
+ if(s.radio>=2&&S.beacon<S.target)g.push({room:'comms',score:36,sys:1});
+ if(RM.mast&&s.radio===3&&S.beacon<S.target)g.push({room:'mast',score:30,sys:1});
+ if(RM.shop&&Math.min(s.power,s.radio)<3)g.push({room:'shop',score:base[s.power<s.radio?'power':'radio'][Math.min(s.power,s.radio)]-14,sys:1});
+ if(RM.sauna&&S.frost>0&&s.heat>=1)g.push({room:'sauna',score:26+S.frost*9,sys:1});
+ if(RM.dome)g.push({room:'dome',score:7});
+ if(c.items.length<3)ROOMS.forEach(function(r){var p=S.pools[r.id];if(p.length){var sc=10+Math.min(p.length,3)*2;if(r.kitRoom&&!has(c,'kit'))sc+=10;if(r.odds)sc-=4;g.push({room:r.id,score:sc});}});
+ if(has(c,'kit')&&s.power>0)S.crew.forEach(function(x){if(x.free&&x.id!==c.id&&!recentlyClean(x)&&c.sus[x.id]>=d.testT)g.push({room:x.room,score:24+c.sus[x.id]*0.5});});
+ g.push({room:'mess',score:4});
+ return g;
+}
+function hollowGoals(c){
+ var g=[],d=D(),ps=publicSus(c.id);
+ var aggr=d.turnP*((ps>50&&R()<d.careful)?0.35:1);
+ S.crew.forEach(function(h){if(!h.free||h.role==='hollow')return;var pr=(h.ai&&R()<d.predict)?predictMove(h):h.room;if(dist(c.room,pr)<=1&&!RM[pr].safe)g.push({room:pr,score:68*aggr+(has(h,'kit')?8:0)});});
+ SYSK.forEach(function(k){if(S.sys[k]<=0)return;sysRooms(k).forEach(function(rm){var watched=S.crew.some(function(x){return x.free&&x.id!==c.id&&x.room===rm&&x.role!=='hollow';});var sc=28;if(k==='heat')sc+=(S.frost>0?16:0)+(S.sys.heat<=1?12:0);if(k==='radio')sc+=(S.beacon>=S.target-4?24:0)+(S.sys.radio<=1?10:0);if(k==='power')sc+=(S.sys.power===1?14:4);if(!watched||darkAt(rm)||R()>d.careful)g.push({room:rm,score:sc-(RM[rm].alt?4:0)});});});
+ humanGoals(c).forEach(function(x){g.push({room:x.room,score:x.score*0.5});});
+ return g;
+}
+function safety(c,o){
+ var others=S.crew.filter(function(d){return d.free&&d.id!==c.id&&d.room===o;});var ca=(PERS[c.pers]||PERS.player).caution;
+ if(RM[o].safe)return 6*ca;
+ if(others.length===1||(darkAt(o)&&others.length===2)){var v=Math.max.apply(null,others.map(function(x){return c.sus[x.id];}));return -Math.max(0,v-25)*0.7*ca;}
+ if(others.length>=2)return 5*ca;return -4*ca;
+}
+function scoreRooms(c,goals,claims,noise,useSafety){
+ var opts=[c.room].concat(adj(c.room)),best=c.room,bs=-1e9,bg=null;
+ opts.forEach(function(o){var s=-1e9,sg=null;goals.forEach(function(g){var v=g.score-(g.sys&&claims?16*(claims[g.room]||0):0)-14*dist(o,g.room);if(v>s){s=v;sg=g;}});if(s<-1e8)s=0;if(useSafety)s+=safety(c,o);s+=(R()-0.5)*2*noise;if(o===c.room)s+=1;if(s>bs){bs=s;best=o;bg=sg;}});
+ return {room:best,goal:bg};
+}
+function predictMove(h){return scoreRooms(h,humanGoals(h),null,0,true).room;}
+function aiMove(c,claims){
+ var d=D(),res;
+ if(c.role==='hollow'){var low=publicSus(c.id)>50&&R()<d.careful;res=scoreRooms(c,hollowGoals(c),claims,d.noise,low);}
+ else res=scoreRooms(c,humanGoals(c),claims,d.noise,true);
+ if(res.goal&&res.goal.sys)claims[res.goal.room]=(claims[res.goal.room]||0)+1;
+ return res.room;
+}
+function submitMove(dest){
+ if(S.phase!=='move')return;
+ var claims={},moves={};
+ shuffle(S.crew.filter(function(c){return c.free;})).forEach(function(c){
+  if(!c.ai)moves[c.id]=(dest&&(dest===c.room||hasEdge(c.room,dest)))?dest:c.room;else moves[c.id]=aiMove(c,claims);});
+ S.crew.forEach(function(c){if(c.free)c.room=moves[c.id];});
+ S.sel=null;S.phase='action';
+ if(!S.sim){var p=player();if(p.free){var w=occ(p.room,p.id).map(nm);log('sys','You are in the '+RM[p.room].name+(w.length?' with '+w.join(', ')+'.':', alone.'));}}
+ save();
+}
+
+/* ---------- actions ---------- */
+function availActions(c){
+ var a=[],others=occ(c.room,c.id),k=sysOf(c.room),r=RM[c.room];
+ if(c.role==='hollow'&&canTurnAt(c.room,others.length+1))others.forEach(function(o){if(o.role!=='hollow')a.push({type:'turn',target:o.id});});
+ if(has(c,'kit')&&S.sys.power>0)others.forEach(function(o){a.push({type:'test',target:o.id});});
+ if(k&&S.sys[k]<3)a.push({type:'repair'});
+ if(c.room==='comms'&&S.sys.radio>=2&&S.beacon<S.target)a.push({type:'transmit'});
+ if(r.relay&&S.sys.radio===3&&S.beacon<S.target)a.push({type:'transmit'});
+ if(r.tinker&&Math.min(S.sys.power,S.sys.radio)<3)a.push({type:'tinker'});
+ if(k&&c.role==='hollow'&&S.sys[k]>0)a.push({type:'sabotage'});
+ if(r.items&&c.items.length<3)a.push({type:'search'});
+ a.push({type:'wait'});
+ return a;
+}
+function aiAction(c,ctx){ctx=ctx||{};
+ var d=D(),others=occ(c.room,c.id),k=sysOf(c.room),r=RM[c.room];
+ var canSearch=r.items&&S.pools[c.room].length&&c.items.length<3;
+ var txKey=r.relay?'tx2':'tx';
+ var canTx=((c.room==='comms'&&S.sys.radio>=2)||(r.relay&&S.sys.radio===3))&&S.beacon<S.target&&!ctx[txKey];
+ if(c.role!=='hollow'){
+  if(has(c,'kit')&&S.sys.power>0&&others.length){var t=maxBy(others.filter(function(o){return !recentlyClean(o);}),function(o){return c.sus[o.id];});
+   if(t&&c.sus[t.id]>=d.testT+(reliableAt(c.room)?0:d.weight*6))return {type:'test',target:t.id};}
+  if(k==='heat'&&S.sys.heat<3)return {type:'repair'};
+  if(canTx&&(r.relay||S.sys.radio===3||R()<0.6)){ctx[txKey]=1;return {type:'transmit'};}
+  if(k&&S.sys[k]<3)return {type:'repair'};
+  if(r.tinker&&!ctx.tinker&&Math.min(S.sys.power,S.sys.radio)<3){ctx.tinker=1;return {type:'tinker'};}
+  if(r.thaw&&S.frost>0&&S.sys.heat>=1)return {type:'wait'};
+  if(canSearch)return {type:'search'};
+  return {type:'wait'};
+ }
+ var nh=others.filter(function(o){return o.role!=='hollow';});
+ if(canTurnAt(c.room,others.length+1)&&nh.length>=1){var p=d.turnP;if(publicSus(c.id)>55)p*=(1-d.careful*0.6);if(R()<p)return {type:'turn',target:pick(nh).id};}
+ if(k&&S.sys[k]>0){if(nh.length===0||darkAt(c.room))return {type:'sabotage'};if(R()>d.careful+0.25)return {type:'sabotage'};}
+ if(k&&S.sys[k]<3&&nh.length&&R()<d.bluff)return {type:'repair'};
+ if(has(c,'kit')&&S.sys.power>0&&nh.length&&R()<d.bluff*0.5){var tt=minBy(nh,function(o){return publicSus(o.id);});return {type:'test',target:tt.id};}
+ if(canTx&&nh.length&&R()<d.bluff*0.4){ctx[txKey]=1;return {type:'transmit'};}
+ if(canSearch)return {type:'search'};
+ return {type:'wait'};
+}
+function doTest(c,x,ev){
+ if(!c.free||!x.free||!has(c,'kit')||S.sys.power<=0||c.room!==x.room)return;
+ take(c,'kit');
+ if(!reliableAt(c.room)&&R()<0.2){log('sys','🧫 '+nm(c)+' tested '+nm(x)+' in the '+RM[c.room].name+', but the sample spoiled: INCONCLUSIVE. (Tests never fail in a medical room.)');return;}
+ if(x.role==='hollow'){
+  x.free=false;x.room='locker';ev.revealed.push(x.id);
+  log('alert','🧫 '+nm(c)+' tested '+nm(x)+': the sample writhes. '+(x.isPlayer?'You are':nm(x)+' is')+' HOLLOW! '+(x.isPlayer?'You are':'They are')+' dragged into the Cold Locker.');
+  S.hist.push('R'+S.round+': '+nm(c)+' exposed '+nm(x)+' with a test.');
+  say(c,'found');say(x,'caught');
+  S.crew.forEach(function(o){if(!o.free&&o.id!==x.id)return;o.sus[x.id]=100;bump(o,c.id,-15);
+   S.pairs.forEach(function(p){if(p.r<S.round-6)return;var other=p.a===x.id?p.b:(p.b===x.id?p.a:null);if(other===null||other===o.id)return;bump(o,other,(30-(S.round-p.r)*3)*wgt());});});
+ }else{
+  x.clean=S.round;
+  log('event','🧫 '+nm(c)+' tested '+nm(x)+': CLEAN. '+(x.isPlayer?'You are':nm(x)+' is')+' human, for now.');
+  S.crew.forEach(function(o){if(o.sus[x.id]!==undefined)o.sus[x.id]=Math.min(o.sus[x.id],6);});
+  if(c.ai&&R()<0.5)say(c,'clean');
+ }
+}
+function doRepair(c,ev){var k=sysOf(c.room);if(!k)return;var b=S.sys[k];var amt=(has(c,'toolkit')&&!RM[c.room].alt)?2:1;S.sys[k]=Math.min(3,b+amt);if(S.sys[k]>b){ev.pub[c.id]='repair';log('sys','🔧 '+nm(c)+' repaired '+SYS[k].name+' ('+S.sys[k]+'/3)'+(RM[c.room].alt?' from the '+RM[c.room].name:'')+'.');}}
+function doTinker(c,ev){if(ev.tinker){if(c.isPlayer)log('priv','🛠️ The bench is already in use this round.');return;}var k=S.sys.power<=S.sys.radio?'power':'radio';if(S.sys[k]>=3)return;ev.tinker=1;S.sys[k]++;ev.pub[c.id]='tinker';log('sys','🛠️ '+nm(c)+' patched '+SYS[k].name+' at the Workshop bench ('+S.sys[k]+'/3).');}
+function doTransmit(c,ev){var relay=!!RM[c.room].relay;if(relay?S.sys.radio<3:(c.room!=='comms'||S.sys.radio<2))return;var key=relay?'tx2':'tx';if(ev[key]){if(c.isPlayer)log('priv','📡 Someone is already on that transmitter this round.');return;}ev[key]=1;var amt=1;if(has(c,'booster')){take(c,'booster');amt=2;}S.beacon=Math.min(S.target,S.beacon+amt);ev.pub[c.id]='transmit';log('event','📡 '+nm(c)+' pushed the beacon'+(relay?' from the Relay Mast':'')+(amt>1?' with a booster':'')+' ('+S.beacon+'/'+S.target+').');}
+function doSearch(c,ev){var p=S.pools[c.room],r=RM[c.room];var lit=!darkAt(c.room);var ch=r.odds||(r.lit?0.9:(lit?(r.sure?1:0.75):0.3));if(r.dark)ch=0.7;ev.pub[c.id]='search';
+ if(p&&p.length&&c.items.length<3&&R()<ch){var it=p.pop();c.items.push(it);if(c.isPlayer)log('priv','🔎 You found a '+ITEMS[it].name+'. '+ITEMS[it].desc);}
+ else if(c.isPlayer)log('priv','🔎 You found nothing useful'+(!lit?' in the dark.':'.'));}
+function doSabotage(c,ev){var k=sysOf(c.room);if(!k||S.sys[k]<=0)return;S.sys[k]--;ev.pub[c.id]='search';
+ var wit=darkAt(c.room)?[]:occ(c.room,c.id).filter(function(o){return o.role!=='hollow';});
+ ev.drops.push({sys:k,room:c.room,cause:'sab',by:c.id,witnessed:wit.length>0});
+ S.hist.push('R'+S.round+': '+nm(c)+' sabotaged '+SYS[k].name+' in the '+RM[c.room].name+'.');
+ if(c.isPlayer)log('priv','💥 You quietly damaged the '+SYS[k].name+(wit.length?'... but '+wit.map(nm).join(', ')+' saw you!':'.'));
+ wit.forEach(function(w){
+  if(w.isPlayer&&!w.ai)log('alert','👁️ You saw '+nm(c)+' sabotage the '+SYS[k].name+'! You tell the others.');else say(w,'witness',c,SYS[k].name);
+  w.sus[c.id]=100;
+  S.crew.forEach(function(o){if(o.id!==w.id&&o.id!==c.id)bump(o,c.id,55*trust(o,w)*wgt());});
+ });
+ if(wit.length)say(c,'deny');
+}
+function doTurn(c,v,ev){
+ var n=occ(c.room).length;if(!c.free||!v.free||v.role==='hollow'||c.room!==v.room||!canTurnAt(c.room,n))return;
+ if(has(v,'flare')){take(v,'flare');
+  log('alert','🎆 A flare blazes in the '+RM[c.room].name+'! '+(v.isPlayer?'You drove off an attack from '+nm(c)+'!':nm(v)+' says '+nm(c)+' attacked them.'));
+  if(c.isPlayer)log('alert','Your target had a flare. Everyone knows what you tried.');
+  S.hist.push('R'+S.round+': '+nm(c)+' tried to turn '+nm(v)+' but was driven off by a flare.');
+  say(v,'flare',c);say(c,'deny');
+  v.sus[c.id]=100;S.crew.forEach(function(o){if(o.id!==v.id&&o.id!==c.id)bump(o,c.id,65*trust(o,v)*wgt());});
+  return;}
+ v.role='hollow';v.turnedBy=c.id;v.turnedR=S.round;ev.turned.push(v.id);
+ S.hist.push('R'+S.round+': '+nm(c)+' turned '+nm(v)+' in the '+RM[c.room].name+'.');
+ if(c.isPlayer)log('priv','🩸 You turned '+nm(v)+'. They belong to the Hollow now.');
+ if(v.isPlayer&&!S.sim)S.notice={type:'turned',by:c.id};
+}
+function submitAction(pa){
+ if(S.phase!=='action')return;
+ var acts={},ev={drops:[],occ:{},pub:{},revealed:[],turned:[]};
+ var ctx={};S.crew.forEach(function(c){if(!c.free)return;acts[c.id]=!c.ai?(pa||{type:'wait'}):aiAction(c,ctx);if(acts[c.id].type==='transmit')ctx[RM[c.room].relay?'tx2':'tx']=1;if(acts[c.id].type==='tinker')ctx.tinker=1;});
+ ROOMS.forEach(function(r){ev.occ[r.id]=occ(r.id).map(function(c){return c.id;});var o=ev.occ[r.id];if(r.safe)return;if(o.length===2)S.pairs.push({a:o[0],b:o[1],r:S.round,room:r.id});else if(o.length===3&&darkAt(r.id)){S.pairs.push({a:o[0],b:o[1],r:S.round,room:r.id});S.pairs.push({a:o[0],b:o[2],r:S.round,room:r.id});S.pairs.push({a:o[1],b:o[2],r:S.round,room:r.id});}});
+ var order=shuffle(Object.keys(acts).map(Number));
+ order.forEach(function(id){var a=acts[id];if(a.type==='test')doTest(byId(id),byId(a.target),ev);});
+ order.forEach(function(id){var c=byId(id),a=acts[id];if(!c.free)return;if(a.type==='repair')doRepair(c,ev);else if(a.type==='transmit')doTransmit(c,ev);else if(a.type==='search')doSearch(c,ev);else if(a.type==='tinker')doTinker(c,ev);});
+ order.forEach(function(id){var c=byId(id),a=acts[id];if(c.free&&a.type==='sabotage')doSabotage(c,ev);});
+ order.forEach(function(id){var c=byId(id),a=acts[id];if(c.free&&a.type==='turn')doTurn(c,byId(a.target),ev);});
+ var look=null,thaw=null;order.forEach(function(id){var c=byId(id),a=acts[id];if(!c.free||a.type!=='wait')return;if(RM[c.room].lookout&&!look)look=c;if(RM[c.room].thaw&&!thaw)thaw=c;});
+ if(thaw&&S.frost>0&&S.sys.heat>=1){S.frost--;log('sys','♨️ '+nm(thaw)+' kept the sauna stoked. Frost thaws ('+S.frost+'/'+S.frostMax+').');}
+ // storm
+ if(R()<0.4){var k=pick(SYSK);if(S.sys[k]>0){S.sys[k]--;if(look){log('event','🔭 '+nm(look)+' spots the storm from the Star Dome: it knocked out 1 '+SYS[k].name+' ('+S.sys[k]+'/3).');}else{ev.drops.push({sys:k,room:SYS[k].room,cause:'storm',witnessed:false});S.hist.push('R'+S.round+': the storm silently knocked out 1 '+SYS[k].name+'.');}}}
+ if(R()<0.16){var g=pick(SYSK);if(S.sys[g]>0){S.sys[g]--;log('event','🌨️ A gale slams the station. '+SYS[g].name+' −1 ('+S.sys[g]+'/3).');}}
+ ev.drops.forEach(function(dp){if(!dp.witnessed)log('alert','⚠️ '+SYS[dp.sys].name+' dropped with no explanation ('+S.sys[dp.sys]+'/3). Who was in the '+RM[dp.room].name+'?');});
+ if(S.sys.radio<=0&&S.beacon>0){S.beacon--;log('alert','📴 Radio is dead. The beacon loses its lock ('+S.beacon+'/'+S.target+').');}
+ if(S.sys.heat<=0){S.frost++;log('alert','❄️ No heat. Frost spreads through the halls ('+S.frost+'/'+S.frostMax+').');}
+ else if(S.sys.heat===3&&S.frost>0){S.frost--;log('sys','♨️ Full heat thaws the station a little (frost '+S.frost+'/'+S.frostMax+').');}
+ updateEvidence(ev);
+ if(checkWin()){save();return;}
+ briefingChatter();
+ S.phase='briefing';save();
+}
+function updateEvidence(ev){
+ var d=D();
+ S.crew.forEach(function(o){
+  for(var id in o.sus){o.sus[id]=clamp(o.sus[id]+(20-o.sus[id])*0.05+(R()-0.5)*d.noise*0.6,0,100);}
+  ev.drops.forEach(function(dp){if(dp.witnessed)return;var ids=ev.occ[dp.room].filter(function(i){return i!==o.id;});
+   var selfThere=ev.occ[dp.room].indexOf(o.id)>=0;
+   if(ids.length===1&&!selfThere){var x=ids[0];if(ev.pub[x]==='repair'&&d.weight>=1)return;bump(o,x,34*wgt());}
+   else if(ids.length>=1&&selfThere&&o.role==='crew'){ids.forEach(function(x){bump(o,x,(ids.length===1?20:6)*wgt());});}
+   else if(ids.length>1)ids.forEach(function(x){bump(o,x,5*wgt());});});
+  S.pairs.forEach(function(p){if(p.r!==S.round)return;
+   if(p.a===o.id||p.b===o.id){var other=p.a===o.id?p.b:p.a;if(o.role==='crew'&&ev.turned.indexOf(o.id)<0)bump(o,other,-10*wgt());}
+   else{bump(o,p.a,3);bump(o,p.b,3);var sa=o.sus[p.a]||0,sb=o.sus[p.b]||0;if(sa>50)bump(o,p.b,(sa-50)*0.4*wgt());if(sb>50)bump(o,p.a,(sb-50)*0.4*wgt());}});
+  if(o.turnedBy!==null&&o.role==='hollow'){} // turned crew now act as Hollow; they know their maker
+ });
+ S.crew.forEach(function(x){if(x.clean===S.round)S.crew.forEach(function(o){if(o.sus[x.id]!==undefined)o.sus[x.id]=Math.min(o.sus[x.id],8);});});
+}
+/* ---------- briefing ---------- */
+function briefingChatter(){
+ var d=D();S.lastBrief=[];
+ var sp=shuffle(S.crew.filter(function(c){return c.free&&c.ai&&!c.isPlayer;})).slice(0,2+(R()<0.5?1:0));
+ sp.forEach(function(s){
+  var others=S.crew.filter(function(x){return x.free&&x.id!==s.id;});if(!others.length)return;
+  var t=null;
+  if(s.role==='hollow'){if(R()<d.bluff){var hs=others.filter(function(x){return x.role!=='hollow'&&!recentlyClean(x);});
+    if(hs.length){t=R()<0.5?maxBy(hs,function(x){return publicSus(x.id);}):maxBy(hs,function(x){return x.sus[s.id];});}}}
+  else{var m=maxBy(others,function(x){return s.sus[x.id];});if(m&&s.sus[m.id]>42)t=m;}
+  if(t){say(s,'acc',t);S.crew.forEach(function(o){if(o.id!==s.id&&o.id!==t.id)bump(o,t.id,7*trust(o,s)*wgt());});bump(t,s.id,8);
+   if(t.ai&&t.free&&R()<0.6)say(t,'def');}
+  else if(R()<0.5)say(s,'idle');
+ });
+}
+function aiProposal(){
+ var d=D(),best=null;
+ S.crew.forEach(function(a){if(!a.free||!a.ai)return;
+  var others=S.crew.filter(function(x){return x.free&&x.id!==a.id&&!(S.cooldown[x.id]>S.round);});if(!others.length)return;
+  if(a.role==='crew'){var t=maxBy(others,function(x){return a.sus[x.id];});if(t&&a.sus[t.id]>=d.propT&&!recentlyClean(t)){var st=a.sus[t.id];if(!best||st>best.str)best={by:a.id,target:t.id,str:st};}}
+  else if(R()<d.bluff*0.5){var hs=others.filter(function(x){return x.role!=='hollow'&&!recentlyClean(x);});var h=maxBy(hs,function(x){return publicSus(x.id);});if(h){var ps=publicSus(h.id);if(ps>=32&&(!best||ps+8>best.str))best={by:a.id,target:h.id,str:ps+8};}}
+ });
+ return best;
+}
+function submitProposal(tid){
+ if(S.phase!=='briefing')return;
+ var p=player(),prop=null;
+ if(tid!==null&&tid!==undefined&&p.free&&!p.ai)prop={by:0,target:tid};
+ else prop=aiProposal();
+ if(!prop){log('sys','Briefing ends with no one proposing a lockup.');endRound();return;}
+ S.vote={by:prop.by,target:prop.target};S.phase='vote';
+ var b=byId(prop.by),t=byId(prop.target);
+ log('event','🗳️ '+nm(b)+(b.isPlayer?' propose':' proposes')+' locking '+(t.isPlayer?'you':nm(t))+' in the Cold Locker.');
+ if(!p.free||p.ai||p.id===prop.target){submitVote(p.id===prop.target&&p.free&&!p.ai?false:null);return;}
+ save();
+}
+function aiVote(v,t,prop){
+ var d=D();if(v.id===t.id)return false;if(v.id===prop.by)return true;
+ if(v.role==='hollow'){if(t.role!=='hollow')return true;
+  if(R()<d.careful){var yes=S.crew.filter(function(x){return x.free&&x.role==='crew'&&x.ai&&x.id!==t.id&&x.sus[t.id]>=d.voteT;}).length;var vot=S.crew.filter(function(x){return x.free;}).length;if(yes+1>vot/2)return true;}return false;}
+ if(recentlyClean(t))return false;
+ var th=d.voteT+(PERS[v.pers]||PERS.player).voteAdj;
+ return v.sus[t.id]+(trust(v,byId(prop.by))-0.5)*16>=th;
+}
+function submitVote(pv){
+ if(S.phase!=='vote')return;
+ var pr=S.vote,t=byId(pr.target),yes=[],no=[];
+ S.crew.forEach(function(v){if(!v.free)return;var y;if(!v.ai)y=(v.id===t.id)?false:!!pv;else y=aiVote(v,t,pr);(y?yes:no).push(v);});
+ var pass=yes.length>(yes.length+no.length)/2;
+ yes.forEach(function(v){if(v.ai&&R()<0.25)say(v,'yes');});
+ log('sys','Votes — YES: '+(yes.map(nm).join(', ')||'none')+' · NO: '+(no.map(nm).join(', ')||'none'));
+ if(pass){t.free=false;t.room='locker';log('alert','🔒 '+(t.isPlayer?'You are':nm(t)+' is')+' sealed in the Cold Locker.');S.hist.push('R'+S.round+': the crew locked up '+nm(t)+' ('+(t.role==='hollow'?'Hollow':'human')+').');
+  if(t.ai)say(t,t.role==='hollow'?'caught':'def');}
+ else{log('sys','The vote fails. '+(t.isPlayer?'You stay':nm(t)+' stays')+' free.');S.cooldown[t.id]=S.round+2;}
+ // social fallout: voting against the proposer
+ S.crew.forEach(function(o){if(!o.free)return;no.forEach(function(n){if(n.id!==o.id&&n.id!==t.id&&o.sus[t.id]>70)bump(o,n.id,6*wgt());});yes.forEach(function(n){if(n.id!==o.id&&o.sus[t.id]<20)bump(o,n.id,5*wgt());});});
+ S.vote=null;
+ if(checkWin()){save();return;}
+ endRound();
+}
+function endRound(){
+ if(S.over)return;
+ if(S.round>=MAXR){S.over={winner:'hollow',why:'The storm outlasted you. No rescue came, and the Hollow had all the time in the world.'};S.phase='over';save();return;}
+ S.round++;S.phase='move';S.sel=null;
+ if(checkWin()){save();return;}
+ save();
+}
+function checkWin(){
+ if(S.over)return true;
+ var fr=S.crew.filter(function(c){return c.free;}),fh=fr.filter(function(c){return c.role==='hollow';}).length,fc=fr.length-fh,w=null,why='';
+ if(fh===0){w='crew';why='Every Hollow is sealed in the Cold Locker. The station is safe — until the next storm.';}
+ else if(fh>fc||(fh===fc&&fr.length<=4)){w='hollow';why='The Hollow now outnumber what is left of the free crew. Halvard Ridge belongs to them.';}
+ else if(S.frost>=S.frostMax){w='hollow';why='The heat stayed dead too long. The station froze solid — and the Hollow simply wait for spring.';}
+ else if(S.beacon>=S.target){w='crew';why='The beacon got through. A rescue flight skids onto the ice and the survivors are screened one by one.';}
+ if(w){S.over={winner:w,why:why};S.phase='over';log(w==='crew'?'priv':'alert','🏁 '+why);return true;}
+ return false;
+}
+/* ---------- simulation (testing) ---------- */
+function runSim(opts){
+ var keep=S,res={crew:0,hollow:0,reasons:{},rounds:0,games:0,playerTurned:0,errors:0};
+ for(var i=0;i<opts.games;i++){
+  newGame({ai:opts.ai,diff:opts.diff,role:opts.role||'random',sim:true,size:opts.size||'small',random:opts.random!==false});
+  var guard=0;
+  while(!S.over&&guard++<500){if(S.phase==='move')submitMove(null);else if(S.phase==='action')submitAction(null);else if(S.phase==='briefing')submitProposal(null);else if(S.phase==='vote')submitVote(null);}
+  if(!S.over){res.errors++;continue;}
+  res.games++;res[S.over.winner]++;res.rounds+=S.round;var key=S.over.why.slice(0,22);res.reasons[key]=(res.reasons[key]||0)+1;
+ }
+ res.avgRounds=res.games?(res.rounds/res.games).toFixed(1):0;
+ S=keep;return res;
+}
+
+/* ---------- original inline art ---------- */
+var IC={
+ mess:'<path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 11h2a2 2 0 0 1 0 4h-2"/><path d="M8 3c0 2 2 2 2 4M12 3c0 2 2 2 2 4"/>',
+ gen:'<circle cx="12" cy="12" r="8"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/><path d="M13 7.5l-3 5h4l-3 4.5"/>',
+ comms:'<path d="M12 21V11"/><path d="M8 21l4-10 4 10"/><circle cx="12" cy="8.5" r="1.6"/><path d="M8.6 5a5 5 0 0 0 0 7M15.4 5a5 5 0 0 1 0 7M5.8 2.5a8.5 8.5 0 0 0 0 12M18.2 2.5a8.5 8.5 0 0 1 0 12"/>',
+ boiler:'<rect x="5" y="3" width="14" height="18" rx="3"/><path d="M12 8.5c2 2 3 3.5 3 5.5a3 3 0 0 1-6 0c0-1.5 1-2.5 1.5-3.5.5 1 1 1.5 1.5 1.5 0-1.5-.5-2.5 0-3.5z"/><path d="M8 21v1M16 21v1"/>',
+ med:'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/>',
+ lab:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/><path d="M7.5 15h9"/><circle cx="11" cy="18" r=".7"/><circle cx="14" cy="17" r=".7"/>',
+ dome:'<path d="M3 19h18M5 19a7 7 0 0 1 14 0"/><path d="M11 14l7-7"/><path d="M16.5 5.5l2 2"/><path d="M4 5l.5 1M7 3l.3 1M20 12l1 .3"/>',
+ bay:'<path d="M5 13V9h6l2 4"/><path d="M3 13h17l1 2H3z"/><rect x="2.5" y="15" width="19" height="5" rx="2.5"/><circle cx="7" cy="17.5" r="1"/><circle cx="12" cy="17.5" r="1"/><circle cx="17" cy="17.5" r="1"/>',
+ bunks:'<path d="M4 3v18M20 3v18M4 9h16M4 16h16"/><rect x="6" y="6" width="4" height="3" rx="1"/><rect x="6" y="13" width="4" height="3" rx="1"/>',
+ glass:'<path d="M3 20h18M5 20V10l7-5 7 5v10"/><path d="M12 20v-6"/><path d="M12 16c-2.2 0-3.4-1.2-3.4-3.4 2.2 0 3.4 1.2 3.4 3.4zM12 15c2.2 0 3.4-1.2 3.4-3.4-2.2 0-3.4 1.2-3.4 3.4z"/>',
+ depot:'<path d="M6 6h9l3 3v12H6z"/><path d="M9 3h5M11.5 3v3"/><path d="M12 11c1.6 1.6 2.2 2.6 2.2 3.6a2.2 2.2 0 0 1-4.4 0c0-1 .6-2 2.2-3.6z"/>',
+ shop:'<path d="M14.5 4a4 4 0 0 0 5.2 5.2L10 19a2.1 2.1 0 0 1-3-3l9.8-9.7A4 4 0 0 0 14.5 4z"/><path d="M3 7l4-4 3 3-4 4z"/>',
+ mast:'<path d="M12 6v-3"/><path d="M8 22l4-16 4 16M9.4 16h5.2M10.4 11h3.2M6 22h12"/><path d="M7.5 4.5a6 6 0 0 1 9 0"/>',
+ vault:'<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5L12 12l8-4.5M12 12v9"/>',
+ sauna:'<path d="M3 20h18M5 20v-4h14v4"/><path d="M8 13c-1.2-1.5 1.2-2.5 0-4s1.2-2.5 0-4M12 13c-1.2-1.5 1.2-2.5 0-4s1.2-2.5 0-4M16 13c-1.2-1.5 1.2-2.5 0-4s1.2-2.5 0-4"/>',
+ archive:'<rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M5 9h14M5 15h14"/><rect x="9" y="5" width="6" height="2" rx="1"/><rect x="9" y="11" width="6" height="2" rx="1"/><rect x="9" y="17" width="6" height="2" rx="1"/>',
+ power:'<path d="M13 2L5 13h6l-1 9 8-11h-6z"/>',
+ radio:'<path d="M12 21v-8"/><circle cx="12" cy="11" r="1.7"/><path d="M8.2 7.2a5.5 5.5 0 0 0 0 7.6M15.8 7.2a5.5 5.5 0 0 1 0 7.6M5.3 4.3a9.6 9.6 0 0 0 0 13.4M18.7 4.3a9.6 9.6 0 0 1 0 13.4"/>',
+ heat:'<path d="M12 2.5c3 3.5 6.2 6.6 6.2 10.8a6.2 6.2 0 0 1-12.4 0c0-2.6 1.5-4.2 2.6-5.6.5 1.6 1.5 2.6 2.6 2.6 0-3 0-5.2 1-7.8z"/>',
+ beacon:'<path d="M12 21V12M8.5 21h7"/><circle cx="12" cy="9" r="3"/><path d="M5 4.5l2 2M19 4.5l-2 2M3 10h2M19 10h2"/>',
+ frost:'<path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7"/><path d="M9.5 3.8L12 5.5l2.5-1.7M9.5 20.2L12 18.5l2.5 1.7M3.6 10.2l2.7-.8-.7-2.7M20.4 13.8l-2.7.8.7 2.7M3.6 13.8l2.7.8-.7 2.7M20.4 10.2l-2.7-.8.7-2.7"/>',
+ kit:'<path d="M9 2.5h6M10 2.5v14a2 2 0 0 0 4 0v-14"/><path d="M10 11h4"/><path d="M18 8c.9 1.1 1.4 1.9 1.4 2.6a1.4 1.4 0 0 1-2.8 0c0-.7.5-1.5 1.4-2.6z"/>',
+ toolkit:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M9 9V6h6v3M3 14h18"/><rect x="10" y="12.5" width="4" height="3" rx=".8"/>',
+ flare:'<path d="M5 20l7.5-7.5"/><path d="M11 11.5l1.5 1.5"/><circle cx="15" cy="9" r="2.3"/><path d="M15 3.5v1.5M20.5 9H19M18.9 5.1l-1 1M18.9 12.9l-1-1M11.1 5.1l1 1"/>',
+ booster:'<path d="M4 20a11 11 0 0 1 0-14l14 14a11 11 0 0 1-14 0z"/><path d="M11 13l5-5"/><path d="M14 4.5a5.5 5.5 0 0 1 5.5 5.5M14 1.5a8.5 8.5 0 0 1 8.5 8.5"/>',
+ repair:'<path d="M14.5 4a4 4 0 0 0 5.2 5.2L10 19a2.1 2.1 0 0 1-3-3l9.8-9.7A4 4 0 0 0 14.5 4z"/>',
+ sabotage:'<path d="M12 2l1.8 5.5L19.5 6l-3.3 4.6 4.8 2.9-5.7.8.7 5.7-4-3.9-4 3.9.7-5.7-5.7-.8 4.8-2.9L4.5 6l5.7 1.5z"/>',
+ turn:'<path d="M12 3c4 5 6.2 8 6.2 11a6.2 6.2 0 0 1-12.4 0C5.8 11 8 8 12 3z"/><path d="M12 11.5a2.5 2.5 0 1 0 2.5 2.5"/>',
+ search:'<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l6 6"/>',
+ wait:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+ lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><path d="M12 15v2"/>',
+ no:'<circle cx="12" cy="12" r="9"/><path d="M8 8l8 8"/>',
+ move:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+ stay:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/>',
+ vote:'<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10l3-7h5l-2 7"/><path d="M8 15h8"/>',
+ menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
+ help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 1-1 1.7v.5"/><circle cx="12" cy="17" r=".6"/>',
+ back:'<path d="M15 5l-7 7 7 7"/>',
+ dice:'<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.2"/><circle cx="15" cy="15" r="1.2"/><circle cx="15" cy="9" r="1.2"/><circle cx="9" cy="15" r="1.2"/>',
+ map:'<path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/>',
+ dark:'<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/>',
+ shield:'<path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/>'
+};
+function icon(n,cls,sz){var p=IC[n]||IC.help;return '<svg class="ic '+(cls||'')+'" viewBox="0 0 24 24"'+(sz?' width="'+sz+'" height="'+sz+'"':'')+' fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';}
+var AV={
+ You:{skin:'#d9b396',hair:'#3a2a1f',style:'hood',acc:'goggles',hood:'#e9eef3'},
+ Ines:{skin:'#e8c4a8',hair:'#2b1d14',style:'beanie',acc:'glasses',hat:'#3d6f9e'},
+ Tobias:{skin:'#d9a57e',hair:'#6b3e1f',style:'hood',acc:'beard',hood:'#4b5d3a'},
+ Mara:{skin:'#f1d3bd',hair:'#c9a14a',style:'bun'},
+ Dev:{skin:'#8d5a3b',hair:'#1a1110',style:'curly'},
+ Hollis:{skin:'#e0b494',hair:'#5a5a5a',style:'short',acc:'goggles'},
+ Yuki:{skin:'#f0d2b0',hair:'#151515',style:'bob'},
+ Sasha:{skin:'#c98e6a',hair:'#8a2f1f',style:'hood',acc:'fur',hood:'#5b3b5e'},
+ Ruben:{skin:'#b9805a',hair:'#2a2a2a',style:'beanie',acc:'mustache',hat:'#9e4a3d'}
+};
+function avatar(c,sz){
+ var a=AV[c.isPlayer?'You':c.name]||AV.You,h=a.hair,o='';
+ o+='<circle cx="20" cy="20" r="20" fill="'+c.color+'"/>';
+ o+='<path d="M5 41c1.5-9 7.5-13.5 15-13.5S33.5 32 35 41z" fill="#1c2c40"/><path d="M15 28.5l5 4 5-4" fill="none" stroke="#8fb3d0" stroke-width="1.2"/>';
+ if(a.style==='hood'){o+='<ellipse cx="20" cy="19" rx="12.8" ry="13.8" fill="'+(a.hood||'#334')+'"/>';if(a.acc==='fur')o+='<ellipse cx="20" cy="19" rx="11.6" ry="12.6" fill="none" stroke="#efe6d6" stroke-width="2.4" stroke-dasharray="1.6 1.2"/>';}
+ if(a.style==='bob')o+='<path d="M10.5 26V16a9.5 10 0 0 1 19 0v10z" fill="'+h+'"/>';
+ o+='<ellipse cx="20" cy="19" rx="8.2" ry="9.2" fill="'+a.skin+'"/>';
+ o+='<circle cx="16.8" cy="19" r="1.05" fill="#1b1b1b"/><circle cx="23.2" cy="19" r="1.05" fill="#1b1b1b"/>';
+ o+='<path d="M17.6 23.6q2.4 1.3 4.8 0" fill="none" stroke="#6a3426" stroke-width="1" stroke-linecap="round"/>';
+ if(a.style==='beanie')o+='<path d="M11.3 16.5a8.7 8.7 0 0 1 17.4 0z" fill="'+a.hat+'"/><rect x="10.6" y="14.8" width="18.8" height="3.2" rx="1.6" fill="'+a.hat+'" stroke="#0003"/><circle cx="20" cy="7" r="2.1" fill="#f3f3f3"/>';
+ if(a.style==='bun')o+='<path d="M11.8 18a8.4 9 0 0 1 16.4 0c-2.8-3.2-5.6-4.4-8.2-4.4s-5.4 1.2-8.2 4.4z" fill="'+h+'"/><circle cx="20" cy="8" r="3.4" fill="'+h+'"/>';
+ if(a.style==='curly')[[13,12.5],[16.8,9.8],[21.4,9.4],[25.8,11.6],[11.8,16.2],[28.2,16]].forEach(function(p){o+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.4" fill="'+h+'"/>';});
+ if(a.style==='short')o+='<path d="M11.8 18c0-6.2 3.8-9 8.2-9s8.2 2.8 8.2 9c-2-3-4.8-4.2-8.2-4.2s-6.2 1.2-8.2 4.2z" fill="'+h+'"/>';
+ if(a.style==='bob')o+='<path d="M11.5 18c0-6 3.8-9 8.5-9s8.5 3 8.5 9c-3.5 0-6.5-1.8-8.5-4.4-2 2.6-5 4.4-8.5 4.4z" fill="'+h+'"/>';
+ if(a.acc==='glasses')o+='<circle cx="16.8" cy="19" r="2.7" fill="none" stroke="#1d2a36" stroke-width="1.1"/><circle cx="23.2" cy="19" r="2.7" fill="none" stroke="#1d2a36" stroke-width="1.1"/><path d="M19.5 19h1" stroke="#1d2a36" stroke-width="1.1"/>';
+ if(a.acc==='beard')o+='<path d="M11.9 20c0 6.3 3.7 9.3 8.1 9.3s8.1-3 8.1-9.3c-1 3-3.4 4.2-8.1 4.2s-7.1-1.2-8.1-4.2z" fill="'+h+'"/>';
+ if(a.acc==='mustache')o+='<path d="M16.2 22.8c2-1.4 5.6-1.4 7.6 0-2 .5-5.6.5-7.6 0z" fill="'+h+'"/>';
+ if(a.acc==='goggles')o+='<rect x="11.6" y="'+(c.isPlayer?'16.2':'11.2')+'" width="16.8" height="5" rx="2.5" fill="#5fb3d9" stroke="#14202b" stroke-width="1.1"/><path d="M20 '+(c.isPlayer?'16.2':'11.2')+'v5" stroke="#14202b" stroke-width="1"/>';
+ return '<svg class="av" viewBox="0 0 40 40" width="'+(sz||24)+'" height="'+(sz||24)+'" aria-hidden="true">'+o+'</svg>';
+}
+function titleArt(){
+ var stars='';for(var i=0;i<34;i++){var x=(i*97)%360,y=(i*53)%120;stars+='<circle cx="'+x+'" cy="'+y+'" r="'+(i%5===0?1.2:0.6)+'" fill="#fff" opacity="'+(0.35+(i%4)*0.15)+'"/>';}
+ var flakes='';for(var j=0;j<40;j++){flakes+='<circle cx="'+((j*61)%360)+'" cy="'+((j*37)%230)+'" r="'+(j%3===0?1.6:0.9)+'" fill="#fff" opacity=".7"/>';}
+ return '<svg class="titleart" viewBox="0 0 360 230" role="img" aria-label="A polar research station in a blizzard under an aurora">'+
+ '<defs><linearGradient id="tsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#020611"/><stop offset=".6" stop-color="#0b2340"/><stop offset="1" stop-color="#1b3c5e"/></linearGradient>'+
+ '<linearGradient id="au1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#36f5b0" stop-opacity="0"/><stop offset=".3" stop-color="#36f5b0" stop-opacity=".7"/><stop offset=".7" stop-color="#4fc9ff" stop-opacity=".6"/><stop offset="1" stop-color="#9a7bff" stop-opacity="0"/></linearGradient>'+
+ '<linearGradient id="snowg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dcefff"/><stop offset="1" stop-color="#8db4d6"/></linearGradient>'+
+ '<radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffcf6e" stop-opacity=".7"/><stop offset="1" stop-color="#ffcf6e" stop-opacity="0"/></radialGradient></defs>'+
+ '<rect width="360" height="230" fill="url(#tsky)"/>'+stars+
+ '<g class="aur"><path d="M-20 78C50 25 120 98 190 52S320 28 380 70" stroke="url(#au1)" stroke-width="24" fill="none"/><path d="M-20 98C70 55 140 115 220 76S330 60 380 92" stroke="url(#au1)" stroke-width="12" fill="none" opacity=".6"/></g>'+
+ '<path d="M0 150L45 112 72 132 112 92 150 128 186 104 230 140 268 108 306 130 360 98V230H0z" fill="#132b45"/>'+
+ '<path d="M112 92l-12 13 7-2 5 5 6-6 5 2zM268 108l-9 10 6-1 4 4 4-5 5 1z" fill="#cfe6fa" opacity=".85"/>'+
+ '<path d="M0 182C60 166 120 176 180 170S300 160 360 172V230H0z" fill="url(#snowg)"/>'+
+ '<ellipse cx="160" cy="166" rx="90" ry="30" fill="url(#glow)" opacity=".5"/>'+
+ '<g><rect x="104" y="146" width="96" height="26" rx="3" fill="#2d4560"/><rect x="104" y="143" width="96" height="5" rx="2" fill="#e8f3fb"/>'+
+ '<rect x="112" y="153" width="9" height="7" fill="#ffd27a"/><rect x="127" y="153" width="9" height="7" fill="#ffd27a"/><rect x="142" y="153" width="9" height="7" fill="#20344a"/><rect x="157" y="153" width="9" height="7" fill="#ffd27a"/><rect x="179" y="152" width="12" height="20" fill="#1a2a3c"/>'+
+ '<path d="M202 172v-15a17 17 0 0 1 34 0v15z" fill="#3a5876"/><path d="M204 156a15 15 0 0 1 30 0" fill="none" stroke="#e8f3fb" stroke-width="3"/><path d="M219 141v-6" stroke="#9fb7cc" stroke-width="2"/>'+
+ '<path d="M80 172V108M74 172l6-64 6 64M76 150h8M77 130h6" stroke="#9fb7cc" stroke-width="1.6" fill="none"/><circle class="blink" cx="80" cy="106" r="2.4" fill="#ff5468"/>'+
+ '<rect x="244" y="158" width="30" height="14" rx="2" fill="#29405a"/><rect x="250" y="162" width="7" height="5" fill="#ffd27a"/></g>'+
+ '<path d="M90 172c20-6 50-6 80-2s50 4 70-2c14-4 30-2 40 2H90z" fill="#eaf5ff" opacity=".9"/>'+
+ '<g class="flakes">'+flakes+'</g>'+
+ '<g stroke="#fff" stroke-opacity=".18" stroke-width="1"><path d="M10 20l-30 60M60 0l-40 90M130 10l-40 90M210 0l-40 90M290 10l-40 90M350 0l-40 90"/></g></svg>';
+}
+
+/* ---------- UI ---------- */
+var view='title',setup={ai:5,diff:'normal',role:'crew',size:'medium',random:'on',seed:randSeed()};
+try{var ps=JSON.parse(localStorage.getItem('whiteout-setup')||'null');if(ps)for(var k0 in ps)if(k0!=='seed')setup[k0]=ps[k0];}catch(e){}
+var app=document.getElementById('app'),modal=document.getElementById('modal'),mbox=document.getElementById('mbox'),frostEl=document.getElementById('frost');
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function tok(c,sz){var p=player();var cls='tk'+(c.isPlayer?' me':'')+((p.role==='hollow'&&c.role==='hollow'&&!c.isPlayer)?' ally':'');return '<span class="'+cls+'" title="'+esc(nm(c))+'">'+avatar(c,sz||22)+'</span>';}
+function hasSave(){try{var s=JSON.parse(localStorage.getItem('whiteout-save')||'null');return s&&!s.over&&s.v===2;}catch(e){return false;}}
+function toast(t){var d=document.createElement('div');d.className='toast';d.innerHTML=t;document.body.appendChild(d);setTimeout(function(){d.remove();},2600);}
+function showModal(h){mbox.innerHTML=h;modal.classList.remove('hide');}
+function hideModal(){modal.classList.add('hide');mbox.innerHTML='';}
+function setFrost(){var f=(S&&view==='game')?S.frost/S.frostMax:0;frostEl.style.opacity=String(0.12+f*0.75);}
+
+function renderTitle(){
+ app.innerHTML='<div class="hero">'+titleArt()+'</div><div class="title">Whiteout<br>Protocol</div><div class="sub">Halvard Ridge Station · Day 41 of the storm</div>'+
+ '<div class="card" style="text-align:center;color:#cfe3f2">Six to eight researchers are snowed in at the bottom of the world. Some of them are no longer human.</div>'+
+ (hasSave()?'<button class="btn primary" data-a="continue">'+icon('move')+' Continue game</button>':'')+
+ '<button class="btn '+(hasSave()?'':'primary')+'" data-a="setup">'+icon('frost')+' New game</button>'+
+ '<button class="btn" data-a="howto">'+icon('help')+' How to play</button>';
+}
+function segBtns(key,opts){return '<div class="seg">'+opts.map(function(o){return '<button data-set="'+key+'" data-val="'+o[0]+'" class="'+(String(setup[key])===String(o[0])?'on':'')+'">'+o[1]+'</button>';}).join('')+'</div>';}
+function miniMap(L){var cs='';L.cells.forEach(function(c){cs+='<rect x="'+(c.x*14+1)+'" y="'+(c.y*14+1)+'" width="10" height="10" rx="2" fill="'+(RDEF[c.id].core?'#4b9be0':'#2a4766')+'"/>';});
+ L.edges.forEach(function(e){var a=L.cells.filter(function(c){return c.id===e[0];})[0],b=L.cells.filter(function(c){return c.id===e[1];})[0];cs+='<line x1="'+(a.x*14+6)+'" y1="'+(a.y*14+6)+'" x2="'+(b.x*14+6)+'" y2="'+(b.y*14+6)+'" stroke="#9fe0ff" stroke-width="1.5"/>';});
+ return '<svg viewBox="0 0 '+(L.w*14)+' '+(L.h*14)+'" width="'+(L.w*14*2)+'" height="'+(L.h*14*2)+'" style="display:block;margin:6px auto">'+cs+'</svg>';}
+function renderSetup(){
+ var L=genLayout(setup.size,setup.random==='on',setup.seed);
+ var hc=hollowCount(setup.ai+1,setup.diff);
+ app.innerHTML='<div class="top"><button class="iconbtn" data-a="title">'+icon('back')+'</button><div class="t">New Expedition</div><span style="width:40px"></span></div>'+
+ '<div class="card"><div class="lbl">AI crew</div>'+segBtns('ai',[[5,'5 <small>(6 total)</small>'],[6,'6 <small>(7)</small>'],[7,'7 <small>(8)</small>']])+
+ '<div class="lbl">Difficulty</div>'+segBtns('diff',[['easy','Easy'],['normal','Normal'],['hard','Hard']])+
+ '<div class="hint">'+({easy:'Sloppy Hollow, short beacon, 4 test kits.',normal:'Cunning Hollow, 3 test kits.',hard:'Ruthless bluffers, long beacon, 3 test kits, an extra Hollow in 6- and 8-person crews.'})[setup.diff]+'</div>'+
+ '<div class="lbl">Your role</div>'+segBtns('role',[['crew','Crew'],['random','Random'],['hollow','Hollow']])+
+ '<div class="hint">Hollow at start: '+hc+'. Anyone can be turned later — including you.</div></div>'+
+ '<div class="card"><div class="lbl">Station size</div>'+segBtns('size',[['small','Small <small>3×3</small>'],['medium','Medium <small>3×4</small>'],['large','Large <small>4×4</small>']])+
+ '<div class="lbl">Layout</div>'+segBtns('random',[['on','🎲 Randomize'],['off','Classic']])+
+ (setup.random==='on'?'<div class="lbl">Layout seed</div><div class="seedrow"><input id="seed" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" value="'+esc(setup.seed)+'"><button class="iconbtn" data-a="reroll" aria-label="New seed">'+icon('dice')+'</button></div><div class="hint">Share or reuse a seed to replay the same rooms and corridors.</div>':'<div class="hint">The fixed classic floor plan for this size.</div>')+
+ miniMap(L)+'<div class="hint" style="text-align:center">'+L.cells.length+' rooms · '+L.edges.length+' corridors · <span style="color:#4b9be0">■</span> essential rooms always included</div></div>'+
+ '<button class="btn primary" data-a="start">'+icon('move')+' Start</button>';
+ var si=document.getElementById('seed');if(si)si.addEventListener('input',function(){var v=si.value.toUpperCase().replace(/[^A-Z0-9]/g,'');setup.seed=v||'A';var mm=app.querySelector('.card:nth-of-type(2) svg:last-of-type');var nL=genLayout(setup.size,true,setup.seed);var holder=si.closest('.card');var old=holder.querySelector('svg[width]');if(old)old.outerHTML=miniMap(nL);});
+}
+function renderHowto(){
+ var rooms=ROOM_DEFS.map(function(r){return '<li>'+icon(r.id,'sm')+' <b>'+r.name+'</b>'+(r.core?' <span class="badge">always</span>':'')+' — '+r.fx+'</li>';}).join('');
+ app.innerHTML='<div class="top"><button class="iconbtn" data-a="back">'+icon('back')+'</button><div class="t">How to Play</div><span style="width:40px"></span></div><div class="card howto">'+
+ '<p>A blizzard has cut Halvard Ridge Station off from the world. Something called <b>the Hollow</b> is wearing some of your crewmates. Nobody knows who — except the Hollow.</p>'+
+ '<p><b>Crew win</b> by sealing every Hollow in the Cold Locker, or by pushing the rescue beacon to full.<br><b>Hollow win</b> by outnumbering the free crew (or tying them once only four or fewer are free), or by letting the station freeze.</p>'+
+ '<p><b>Each round:</b></p><ul><li><b>Move</b> — follow a corridor to a neighbouring room, or stay put. Not every room connects to every neighbour.</li><li><b>Act</b> — repair the room\'s system, search for gear, transmit the beacon, test someone with a Test Kit, use a room\'s special ability, or keep watch.</li><li><b>Storm</b> — systems can fail on their own. Some failures are loud; some are silent.</li><li><b>Briefing</b> — anyone may propose locking someone up. A majority of the free crew decides.</li></ul>'+
+ '<p><b>Turning:</b> a Hollow alone in a room with exactly one other person can turn them. If that happens to you, you switch sides. In darkness they can strike even with a third person in the room.</p>'+
+ '<p><b>Sabotage:</b> a Hollow can quietly damage Power, Radio or Heat — but anyone in the room sees it, unless it is dark. Unwitnessed damage is announced as "unexplained". Storm, or whoever was standing there?</p>'+
+ '<p><b>Systems:</b> '+icon('power','sm')+' Power at 0 kills the lights, disables Test Kits and makes searching hard. '+icon('radio','sm')+' Radio must be 2+ to transmit; at 0 the beacon slips. '+icon('heat','sm')+' Heat at 0 adds frost each round; full frost freezes everyone. Full heat thaws one frost.</p>'+
+ '<p><b>Tests</b> are always right in a medical room (Med Bay, Core Lab). Anywhere else, 1 in 5 samples spoil.</p>'+
+ '<p><b>Gear:</b></p><ul>'+['kit','toolkit','flare','booster'].map(function(k){return '<li>'+icon(k,'sm')+' <b>'+ITEMS[k].name+'</b> — '+ITEMS[k].desc+'</li>';}).join('')+'</ul>'+
+ '<p><b>Rooms</b> (each game uses a selection):</p><ul class="roomlist">'+rooms+'</ul>'+
+ '<p><b>Tips:</b> travel in threes. Watch who keeps ending up alone with whom. Tap a name in the crew list to keep notes (🤔 suspect / 👍 trust). Tap a room while not moving to read what it does.</p></div>'+
+ '<button class="btn primary" data-a="back">Got it</button>';
+}
+function meter(k){var v=S.sys[k],cls=v===0?'crit':(v===1?'warn':'');var pips='';for(var i=0;i<3;i++)pips+='<span class="pip'+(i<v?' on':'')+'"></span>';return '<div class="meter '+cls+' m-'+k+'"><div class="n"><span>'+icon(k,'sm')+' '+SYS[k].name+'</span><b>'+v+'/3</b></div><div class="pips">'+pips+'</div></div>';}
+function phaseName(){return {move:'Move',action:'Act',briefing:'Briefing',vote:'Vote',over:'Over'}[S.phase];}
+function roomTag(r){var t='';var k=r.sys||r.alt;if(k)t+=icon(k,'xs')+S.sys[k];if(r.items)t+=(t?' · ':'')+(S.pools[r.id].length?'gear':'empty');if(r.dark)t+=(t?' · ':'')+'dark';if(r.safe)t+=(t?' · ':'')+'safe';if(!t)t=r.id==='mess'?'start':'';return t;}
+function renderMap(p){
+ var L=S.layout,canGo=S.phase==='move'&&p.free,cols=[],rows=[];
+ for(var x=0;x<L.w;x++){cols.push('1fr');if(x<L.w-1)cols.push('11px');}for(var y=0;y<L.h;y++){rows.push('auto');if(y<L.h-1)rows.push('11px');}
+ var h='<div class="map w'+L.w+(darkAt('mess')&&S.sys.power<=0?' blackout':'')+'" style="grid-template-columns:'+cols.join(' ')+';grid-template-rows:'+rows.join(' ')+'">';
+ ROOMS.forEach(function(r){
+  var cls='tile';if(p.free&&p.room===r.id)cls+=' here';if(canGo&&hasEdge(p.room,r.id))cls+=' go';if(canGo&&S.sel===r.id)cls+=' sel';
+  var k=r.sys||r.alt;if(k&&S.sys[k]===0)cls+=' broken';if(darkAt(r.id))cls+=' dk';
+  var toks=S.crew.filter(function(c){return c.free&&c.room===r.id;}).map(function(c){return tok(c,L.w>3?18:21);}).join('');
+  h+='<div class="'+cls+'" data-room="'+r.id+'" style="grid-column:'+(r.x*2+1)+';grid-row:'+(r.y*2+1)+'"><span class="em">'+icon(r.id)+'</span><div class="nm">'+r.name+'</div><div class="tag">'+roomTag(r)+'</div><div class="tok">'+toks+'</div></div>';
+ });
+ L.edges.forEach(function(e){var a=RM[e[0]],b=RM[e[1]];if(a.y===b.y){h+='<div class="cor h" style="grid-column:'+(Math.min(a.x,b.x)*2+2)+';grid-row:'+(a.y*2+1)+'"></div>';}else{h+='<div class="cor v" style="grid-column:'+(a.x*2+1)+';grid-row:'+(Math.min(a.y,b.y)*2+2)+'"></div>';}});
+ return h+'</div>';
+}
+function renderGame(){
+ var p=player(),h='';
+ h+='<div class="top"><button class="iconbtn" data-a="menu" aria-label="Menu">'+icon('menu')+'</button><div style="text-align:center"><div class="t">Whiteout Protocol</div><div class="r">Round '+S.round+'/'+MAXR+' · '+phaseName()+' · '+DIFF[S.diff].label+'</div></div><button class="iconbtn" data-a="howto" aria-label="Help">'+icon('help')+'</button></div>';
+ h+='<div class="meters">'+SYSK.map(meter).join('')+'</div>';
+ h+='<div class="meters2"><div class="meter"><div class="n"><span>'+icon('beacon','sm')+' Beacon</span><b>'+S.beacon+'/'+S.target+'</b></div><div class="bar"><i style="width:'+(100*S.beacon/S.target)+'%"></i></div></div>'+
+   '<div class="meter '+(S.frost>=S.frostMax-1&&S.frost>0?'crit':'')+'"><div class="n"><span>'+icon('frost','sm')+' Frost</span><b>'+S.frost+'/'+S.frostMax+'</b></div><div class="bar frost"><i style="width:'+(100*S.frost/S.frostMax)+'%"></i></div></div></div>';
+ h+=renderMap(p);
+ var locked=S.crew.filter(function(c){return !c.free;});
+ h+='<div class="locker">'+icon('lock','sm')+' Cold Locker: '+(locked.length?locked.map(function(c){return tok(c)+' <span>'+esc(nm(c))+'</span>';}).join(' '):'<span>empty</span>')+'</div>';
+ h+='<div class="panel">'+panelHTML()+'</div>';
+ h+='<div class="card"><div class="me-card"><div class="mav">'+avatar(p,46)+'</div><div style="flex:1"><div class="lbl" style="margin:0">Your role</div><div class="role '+p.role+'">'+(p.role==='hollow'?icon('turn','sm')+' HOLLOW':icon('shield','sm')+' CREW')+'</div><div class="hint" style="margin:0">'+(p.role==='hollow'?'Win: outnumber the free crew or freeze the station.':'Win: lock up every Hollow or finish the beacon.')+'</div></div></div>'+
+  '<div class="items">'+(p.items.length?p.items.map(function(it){return '<button class="item" data-item="'+it+'">'+icon(it,'sm')+' '+ITEMS[it].name+'</button>';}).join(''):'<span class="hint" style="margin:0">No gear. Search rooms to find some (max 3).</span>')+'</div></div>';
+ h+='<div class="lbl">Crew</div><div class="crew">'+S.crew.filter(function(c){return !c.isPlayer;}).map(function(c){
+  var b='';if(!c.free)b+='<span class="badge">'+icon('lock','xs')+' locked</span>';
+  if(c.clean>=0)b+='<span class="badge grn">✓ clean R'+c.clean+'</span>';
+  if(p.role==='hollow'&&c.role==='hollow')b+='<span class="badge red">'+icon('turn','xs')+' ally</span>';
+  var n=S.notes[c.id]||'';
+  return '<button class="crow" data-note="'+c.id+'">'+tok(c,36)+'<div class="who"><b>'+esc(c.name)+'</b>'+b+'<div class="loc">'+(c.free?icon(c.room,'xs')+' '+RM[c.room].name:'Cold Locker')+'</div></div><span class="note">'+(n==='s'?'🤔':n==='t'?'👍':'·')+'</span></button>';}).join('')+'</div>';
+ h+='<div class="lbl" style="display:flex;justify-content:space-between"><span>Station log</span><span>newest first</span></div><div class="card log" id="log">'+S.log.slice(-80).reverse().map(function(e){
+  if(e.t==='chat'){var c=byId(e.w);return '<div class="chat"><span class="rn">R'+e.r+'</span>'+tok(c,20)+' <b style="color:'+c.color+'">'+esc(c.name)+':</b> “'+esc(e.x)+'”</div>';}
+  return '<div class="'+e.t+'"><span class="rn">R'+e.r+'</span>'+esc(e.x)+'</div>';}).join('')+'</div>';
+ app.innerHTML=h;
+ if(S.notice&&!S.over){var by=byId(S.notice.by);showModal('<div style="text-align:center">'+avatar(by,72)+'</div><div class="big lose">TURNED</div><p>In the '+RM[p.room].name+', '+esc(by.name)+'\'s face splits open. Then — calm. Warmth. Clarity.</p><p><b>You are now HOLLOW.</b> You win with the Hollow: outnumber the free crew, or let the station freeze. Your allies are marked in red.</p><p class="hint">The crew does not know. Act normal.</p><button class="btn primary" data-a="ack">I understand</button>');}
+ else if(S.over)renderEnd();
+}
+function actIcon(t){return {test:'kit',turn:'turn',repair:'repair',sabotage:'sabotage',transmit:'radio',search:'search',wait:'wait',tinker:'shop'}[t];}
+function actLabel(a){var p=player(),k=sysOf(p.room),r=RM[p.room],ic=icon(actIcon(a.type),'act');
+ switch(a.type){
+ case 'test':return ic+'<span>Test '+esc(byId(a.target).name)+'<small>Uses your Test Kit. '+(reliableAt(p.room)?'Medical room: the result is certain.':'1 in 5 samples spoil outside a medical room.')+'</small></span>';
+ case 'turn':return ic+'<span>Turn '+esc(byId(a.target).name)+'<small>They join the Hollow. If they carry a flare, you\'re exposed.</small></span>';
+ case 'repair':return ic+'<span>Repair '+SYS[k].name+' (+'+((has(p,'toolkit')&&!r.alt)?2:1)+')</span>';
+ case 'sabotage':var w=occ(p.room,p.id).filter(function(o){return o.role!=='hollow';});return ic+'<span>Sabotage '+SYS[k].name+'<small>'+(darkAt(p.room)?'It\'s dark. No one will see.':(w.length?'⚠ '+w.map(function(o){return o.name;}).join(', ')+' will see you!':'No witnesses here.'))+'</small></span>';
+ case 'transmit':return ic+'<span>Transmit beacon (+'+(has(p,'booster')?2:1)+')'+(r.relay?'<small>Relay Mast — works while Radio is full.</small>':'')+'</span>';
+ case 'tinker':return ic+'<span>Bench repair<small>+1 to '+(S.sys.power<=S.sys.radio?'Power':'Radio')+' (the lower one).</small></span>';
+ case 'search':return ic+'<span>Search the '+r.name+'<small>'+(S.pools[p.room].length?'There may be gear here.':'Looks picked clean.')+(darkAt(p.room)?' Hard to see in the dark.':'')+'</small></span>';
+ default:return ic+'<span>'+(r.lookout?'Keep lookout':r.thaw?'Stoke the sauna':'Keep watch')+'<small>'+(r.lookout?'Storm damage this round will be announced, not silent.':r.thaw?(S.frost>0&&S.sys.heat>=1?'Thaws 1 frost.':'Needs frost on the station and Heat 1+.'):'Do nothing; just observe.')+'</small></span>';}
+}
+function panelHTML(){
+ var p=player();
+ if(S.phase==='over')return '<div class="ph">Game over</div><button class="btn primary" data-a="showend">See result</button>';
+ if(!p.free)return '<div class="ph">Locked away</div><div class="pr">You sit in the Cold Locker, listening through the door. The others carry on.</div><div class="row"><button class="btn primary" data-a="auto1">Next ▶</button><button class="btn" data-a="autoall">Skip to end ⏩</button></div>';
+ var r=RM[p.room],fx='<div class="fx">'+icon(r.id,'sm')+' '+r.fx+'</div>';
+ if(S.phase==='move'){var tgt=S.sel||p.room;return '<div class="ph">Step 1 · Move</div><div class="pr">You\'re in the <b>'+r.name+'</b>. Tap a highlighted room (joined by a corridor) to move, or stay.</div><button class="btn primary" data-a="move">'+icon(tgt===p.room?'stay':'move')+' '+(tgt===p.room?'Stay in the '+r.name:'Move to the '+RM[tgt].name)+'</button>'+(S.sel?'<button class="btn ghost" data-a="unsel">Cancel — stay here</button>':'');}
+ if(S.phase==='action'){var w=occ(p.room,p.id);var acts=availActions(p);return '<div class="ph">Step 2 · Act</div><div class="pr"><b>'+r.name+'</b> — '+(w.length?'with '+w.map(function(c){return tok(c,20)+' '+esc(c.name);}).join(', '):'you are alone.')+(darkAt(p.room)?' <b style="color:var(--amber)">'+icon('dark','xs')+' It is dark here.</b>':'')+'</div>'+fx+acts.map(function(a,i){return '<button class="btn act'+(a.type==='turn'||a.type==='sabotage'?' danger':'')+'" data-act="'+i+'">'+actLabel(a)+'</button>';}).join('');}
+ if(S.phase==='briefing'){var others=S.crew.filter(function(c){return c.free&&!c.isPlayer;});return '<div class="ph">Step 3 · Briefing</div><div class="pr">The crew gathers over the intercom. Propose locking someone in the Cold Locker? A majority vote decides.</div><div class="chips">'+others.map(function(c){var cd=S.cooldown[c.id]>S.round;return '<button class="chip" data-prop="'+c.id+'"'+(cd?' disabled style="opacity:.4"':'')+'>'+tok(c,24)+esc(c.name)+'</button>';}).join('')+'</div><button class="btn primary" data-a="noprop">No proposal — continue</button>';}
+ if(S.phase==='vote'){var v=S.vote,t=byId(v.target),b=byId(v.by);return '<div class="ph">'+icon('vote','xs')+' Vote</div><div class="pr">'+tok(b,24)+' <b>'+esc(nm(b))+'</b> '+(b.isPlayer?'propose':'proposes')+' locking '+tok(t,24)+' <b>'+esc(t.name)+'</b> in the Cold Locker.</div><div class="row"><button class="btn danger c" data-vote="1">'+icon('lock')+' Lock them up</button><button class="btn c" data-vote="0">'+icon('no')+' No</button></div>';}
+ return '';
+}
+function renderEnd(){
+ var p=player(),won=S.over.winner===p.role;
+ showModal('<div class="big '+(won?'win':'lose')+'">'+(won?'VICTORY':'DEFEAT')+'</div><p style="text-align:center"><b>'+(S.over.winner==='crew'?'The crew wins.':'The Hollow win.')+'</b><br>'+esc(S.over.why)+'</p><p class="hint" style="text-align:center">You finished as '+(p.role==='hollow'?'Hollow':'crew')+' · Round '+S.round+' · '+SIZES[S.size].label+' station · seed '+esc(S.layout.seed)+'</p>'+
+ '<div class="lbl">Who was who</div><div class="reveal">'+S.crew.map(function(c){return '<div>'+tok(c,28)+' <b>'+esc(nm(c))+'</b> — '+(c.role==='hollow'?'<span style="color:var(--red)">Hollow</span>'+(c.turnedBy!==null?' (turned by '+esc(nm(byId(c.turnedBy)))+', R'+c.turnedR+')':' (from the start)'):'<span style="color:var(--green)">Human</span>')+(c.free?'':' · locked')+'</div>';}).join('')+'</div>'+
+ '<div class="lbl">What really happened</div><div class="reveal" style="font-size:13px">'+(S.hist.map(function(x){return '<div>'+esc(x)+'</div>';}).join('')||'<div>Nothing hidden.</div>')+'</div>'+
+ '<button class="btn primary c" data-a="again">Play again</button><button class="btn c" data-a="replay">Same layout again</button><button class="btn c" data-a="title">Main menu</button><button class="btn ghost c" data-a="closeend">View board</button>');
+}
+function stationGuide(){return '<h3>'+icon('map','sm')+' This station</h3><p class="hint">'+SIZES[S.size].label+' · '+(S.layout.random?'random layout, seed <b style="color:#fff">'+esc(S.layout.seed)+'</b>':'classic layout')+'</p><ul class="roomlist">'+ROOMS.map(function(r){return '<li>'+icon(r.id,'sm')+' <b>'+r.name+'</b> — '+r.fx+'</li>';}).join('')+'</ul><button class="btn c" data-a="closeend">Close</button>';}
+function render(){if(view==='title')renderTitle();else if(view==='setup')renderSetup();else if(view==='howto')renderHowto();else renderGame();setFrost();}
+var backTo='title';
+function autoOne(){if(S.phase==='move')submitMove(null);else if(S.phase==='action')submitAction(null);else if(S.phase==='briefing')submitProposal(null);else if(S.phase==='vote')submitVote(null);}
+function startGame(o){newGame(o);view='game';render();window.scrollTo(0,0);}
+document.addEventListener('click',function(e){
+ var t=e.target.closest('[data-a],[data-set],[data-room],[data-act],[data-prop],[data-vote],[data-note],[data-item]');if(!t)return;
+ var a=t.getAttribute('data-a');
+ if(t.hasAttribute('data-set')){var k=t.getAttribute('data-set'),v=t.getAttribute('data-val');setup[k]=k==='ai'?+v:v;try{localStorage.setItem('whiteout-setup',JSON.stringify(setup));}catch(err){}render();return;}
+ if(t.hasAttribute('data-room')){if(!S)return;var r=t.getAttribute('data-room'),p=player();
+  if(S.phase==='move'&&p.free){if(hasEdge(p.room,r))S.sel=(S.sel===r?null:r);else if(r===p.room)S.sel=null;else{toast(RM[r].name+' isn\'t connected to your room by a corridor.');return;}render();return;}
+  toast('<b>'+RM[r].name+'</b>: '+esc(RM[r].fx));return;}
+ if(t.hasAttribute('data-act')){var acts=availActions(player());var ac=acts[+t.getAttribute('data-act')];if(ac){submitAction(ac);render();}return;}
+ if(t.hasAttribute('data-prop')){submitProposal(+t.getAttribute('data-prop'));render();return;}
+ if(t.hasAttribute('data-vote')){submitVote(t.getAttribute('data-vote')==='1');render();return;}
+ if(t.hasAttribute('data-note')){var id=+t.getAttribute('data-note'),n=S.notes[id]||'';S.notes[id]=n===''?'s':(n==='s'?'t':'');save();render();return;}
+ if(t.hasAttribute('data-item')){var it=ITEMS[t.getAttribute('data-item')];toast('<b>'+it.name+'</b>: '+esc(it.desc));return;}
+ switch(a){
+ case 'setup':view='setup';setup.seed=randSeed();render();break;
+ case 'reroll':setup.seed=randSeed();render();break;
+ case 'title':hideModal();view='title';S=null;render();break;
+ case 'howto':backTo=view;view='howto';render();window.scrollTo(0,0);break;
+ case 'back':view=backTo==='howto'?'title':backTo;render();break;
+ case 'continue':try{S=JSON.parse(localStorage.getItem('whiteout-save'));applyLayout(S.layout);view='game';render();}catch(err){toast('Save could not be loaded.');}break;
+ case 'start':startGame({ai:setup.ai,diff:setup.diff,role:setup.role,size:setup.size,random:setup.random==='on',seed:setup.seed});break;
+ case 'again':hideModal();startGame({ai:S.nAI,diff:S.diff,role:S.roleOpt,size:S.size,random:S.layout.random,seed:randSeed()});break;
+ case 'replay':hideModal();startGame({ai:S.nAI,diff:S.diff,role:S.roleOpt,size:S.size,random:S.layout.random,seed:S.layout.seed});break;
+ case 'move':submitMove(S.sel);render();break;
+ case 'unsel':S.sel=null;render();break;
+ case 'noprop':submitProposal(null);render();break;
+ case 'ack':S.notice=null;save();hideModal();render();break;
+ case 'auto1':autoOne();render();break;
+ case 'autoall':var g=0;while(!S.over&&g++<400)autoOne();render();break;
+ case 'showend':renderEnd();break;
+ case 'closeend':hideModal();break;
+ case 'guide':showModal(stationGuide());break;
+ case 'menu':showModal('<h3>Menu</h3><p class="hint">Saved automatically after every step. '+SIZES[S.size].label+' station · '+(S.layout.random?'seed <b style="color:#fff">'+esc(S.layout.seed)+'</b>':'classic layout')+'</p><button class="btn" data-a="closeend">'+icon('move')+' Resume</button><button class="btn" data-a="guide">'+icon('map')+' Station guide</button><button class="btn" data-a="howto2">'+icon('help')+' How to play</button><button class="btn danger" data-a="abandon">'+icon('no')+' Abandon game</button>');break;
+ case 'howto2':hideModal();backTo='game';view='howto';render();window.scrollTo(0,0);break;
+ case 'abandon':hideModal();try{localStorage.removeItem('whiteout-save');}catch(err){}S=null;view='title';render();break;
+ }
+});
+window.WP={newGame:newGame,runSim:runSim,state:function(){return S;},submitMove:submitMove,submitAction:submitAction,submitProposal:submitProposal,submitVote:submitVote,availActions:availActions,render:render,genLayout:genLayout,applyLayout:applyLayout};
+render();
+})();</script></body></html>
